@@ -39,32 +39,53 @@ var isValid = function (str) {
     return false;
   }
 
-  const arr = [];
+  const stack = [];
   for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    if (char === "(") {
-      //search for a nearest closing )
-      const closing = str.indexOf(")", i);
-      console.log(closing);
-      const part = str.slice(i, closing + 1);
-      arr.push(part);
+    if (str[i] === "(") {
+      stack.push("(");
     }
-    // if (f === "{") {
-    //   return false;
-    // }
-    // if (f === "[") {
-    //   return false;
-    // }
+    if (str[i] === "{") {
+      stack.push("{");
+    }
+    if (str[i] === "[") {
+      stack.push("[");
+    }
+    if (str[i] === ")") {
+      if (stack[stack.length - 1] === "(") {
+        stack.pop();
+      } else {
+        return false;
+      }
+    }
+    if (str[i] === "}") {
+      if (stack[stack.length - 1] === "{") {
+        stack.pop();
+      } else {
+        return false;
+      }
+    }
+    if (str[i] === "]") {
+      if (stack[stack.length - 1] === "[") {
+        stack.pop();
+      } else {
+        return false;
+      }
+    }
   }
-
-  console.log(arr);
-
+  if (stack.length !== 0) {
+    return false;
+  }
   return true;
 };
 
 console.log(isValid("()"));
+
 console.log(isValid("()()"));
 console.log(isValid("(())"));
-// console.log(isValid("{[]}"));
-// console.log(isValid("()[]{}"));
-// console.log(isValid("(]"));
+console.log(isValid("{[]}"));
+console.log(isValid("()[]{}"));
+console.log("next false");
+console.log(isValid("(]"));
+console.log(isValid("(){}}{"));
+console.log(isValid("{[}]"));
+console.log(isValid("[([]])"));
