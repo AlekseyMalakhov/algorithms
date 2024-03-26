@@ -37,9 +37,7 @@ var licenseKeyFormatting = function (s, k) {
     }
     let res = "";
     let count = 0;
-    //console.log(cleanStr.length - 1);
     for (i = cleanStr.length - 1; i >= 0; i--) {
-        //console.log("i = " + i);
         if (count !== k) {
             res = cleanStr[i] + res;
             count++;
