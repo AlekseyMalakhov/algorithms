@@ -29,6 +29,12 @@ const createPairsOutOfFour = (input) => {
     const i2 = input[1];
     const i3 = input[2];
     const i4 = input[3];
+
+    // const s1 = Math.min(i1, i2) + Math.min(i3, i4);
+    // const s2 = Math.min(i1, i3) + Math.min(i2, i4);
+    // const s3 = Math.min(i1, i4) + Math.min(i2, i3);
+    // return Math.max(s1, s2, s3);
+
     return [
         [
             [i1, i2],
