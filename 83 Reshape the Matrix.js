@@ -29,16 +29,16 @@ var matrixReshape = function (mat, r, c) {
     const newMatrix = [[]];
     let row = 1;
     let column = 1;
-    for (let i = 0; i < mat.length; i++) {
-        for (let j = 0; j < mat[i].length; j++) {
-            newMatrix[row - 1][column - 1] = mat[i][j];
-            if (column < c) {
-                column++;
-            } else if (column === c && row !== r) {
-                row++;
-                newMatrix[row - 1] = [];
-                column = 1;
-            }
+
+    const arr = mat.flat();
+    for (let i = 0; i < arr.length; i++) {
+        newMatrix[row - 1][column - 1] = arr[i];
+        if (column < c) {
+            column++;
+        } else if (column === c && row !== r) {
+            row++;
+            newMatrix[row - 1] = [];
+            column = 1;
         }
     }
     return newMatrix;
