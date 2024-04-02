@@ -52,10 +52,15 @@ const createPairsOutOfFour = (input) => {
 };
 
 var arrayPairSum = function (nums) {
-    const pairs = [];
-    return createPairsOutOfFour(nums);
+    const arr = nums.sort((a, b) => a - b);
+    let sum = 0;
+    for (let i = 0; i < arr.length - 1; i = i + 2) {
+        const min = Math.min(arr[i], arr[i + 1]);
+        sum = sum + min;
+    }
+    return sum;
 };
 
-//console.log(arrayPairSum([1, 4, 3, 2]));
-console.log(arrayPairSum([1, 2, 3, 4]));
-//console.log(arrayPairSum([6, 2, 6, 5, 1, 2]));
+console.log(arrayPairSum([1, 4, 3, 2]));
+//console.log(arrayPairSum([1, 2, 3, 4]));
+console.log(arrayPairSum([6, 2, 6, 5, 1, 2]));
