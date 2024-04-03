@@ -23,85 +23,74 @@ Constraints:
 */
 
 var findLHS = function (nums) {
-    let temp = 0;
-    let max = null;
-    let min = null;
     let length = 0;
+    let max = 0;
+    let min = 0;
+    let lengthMax = 0;
+    let lengthMin = 0;
     for (let i = 0; i < nums.length; i++) {
         const check1 = nums[i];
-        console.log("check1 = " + check1 + ", i = " + i);
+        //console.log("check1 = " + check1);
+        max = check1 + 1;
+        min = check1 - 1;
+        let diff = false;
         for (let j = i + 1; j < nums.length; j++) {
             const check2 = nums[j];
-            console.log("check2 begin = " + check2 + ", j = " + j);
-            if (max === null && min === null) {
-                if (check2 === check1 - 1) {
-                    //console.log("check2 init = " + check2);
-                    max = check1;
-                    min = check2;
+            if (check2 === max) {
+                diff = true;
+                if (lengthMax === 0) {
+                    //console.log("check2 = " + check2 + ", j = " + j + ", to max");
+                    lengthMax++;
                 }
-                if (check2 === check1 + 1) {
-                    //console.log("check2 init = " + check2);
-                    max = check2;
-                    min = check1;
+                //console.log("check2 = " + check2 + ", j = " + j + ", to max");
+                lengthMax++;
+            }
+            if (check2 === min) {
+                diff = true;
+                if (lengthMin === 0) {
+                    lengthMin++;
                 }
-                if (check2 === check1) {
-                    //console.log("check2 equal init = " + check2);
-                    max = check2;
-                    min = check2;
+                lengthMin++;
+            }
+            if (check2 === check1) {
+                if (lengthMin === 0) {
+                    //console.log("check2 = " + check2 + ", j = " + j);
+                    lengthMin++;
                 }
-                temp = 2;
-            } else {
-                if (max === min) {
-                    if (check2 === check1 - 1) {
-                        //console.log("check2 init = " + check2);
-                        max = check1;
-                        min = check2;
-                    }
-                    if (check2 === check1 + 1) {
-                        //console.log("check2 init = " + check2);
-                        max = check2;
-                        min = check1;
-                    }
+                if (lengthMax === 0) {
+                    //console.log("check2 = " + check2 + ", j = " + j + ", to max");
+                    lengthMax++;
                 }
-                if (check2 === max || check2 === min) {
-                    console.log("check2 found = " + check2);
-                    temp++;
-                    if (check2 === check1 - 1) {
-                        max = check1;
-                        min = check2;
-                    }
-                    if (check2 === check1 + 1) {
-                        //-1 === -2 + 1
-                        max = check2; //-1
-                        min = check1; // - 2
-                    }
-                }
+                //console.log("check2 = " + check2 + ", j = " + j + ", to max");
+                lengthMin++;
+                lengthMax++;
             }
         }
+        const temp = Math.max(lengthMax, lengthMin);
         // console.log("max = " + max);
         // console.log("min = " + min);
-        // console.log("temp = " + temp);
-        console.log("---------------------");
-        if (temp > length && max !== min) {
+        // console.log("lengthMax = " + lengthMax);
+        // console.log("lengthMin = " + lengthMin);
+        //console.log("---------------------");
+        if (temp > length && diff) {
             length = temp;
         }
-        temp = 0;
-        max = null;
-        min = null;
+        lengthMax = 0;
+        lengthMin = 0;
     }
     return length;
 };
 
-//console.log(findLHS([1, 3, 2, 2, 5, 2, 3, 7]));
-//console.log(findLHS([1, 2, 3, 4]));
-//console.log(findLHS([1, 1, 1, 1]));
+console.log(findLHS([1, 3, 2, 2, 5, 2, 3, 7])); //5
+console.log(findLHS([1, 2, 3, 4])); //2
+console.log(findLHS([1, 1, 1, 1])); //0
 
-//console.log(findLHS([1, 4, 1, 3, 1, -14, 1, -13]));
+console.log(findLHS([1, 4, 1, 3, 1, -14, 1, -13])); //2
 
-//console.log(findLHS([1, 2, 1, 3, 0, 0, 2, 2, 1, 3, 3]));
+console.log(findLHS([1, 2, 1, 3, 0, 0, 2, 2, 1, 3, 3])); //6
 
-//console.log(findLHS([-3, -1, -1, -1, -3, -2]));
+console.log(findLHS([-3, -1, -1, -1, -3, -2])); //4
 
-//console.log(findLHS([2, 2, 2, 2, 2, 2, 2, 3, 1, 0, 0, 0, 3, 1, -1, 0, 1, 1, 0, 0, 1, 1, 2, 2, 2, 0, 1, 2, 2, 3, 2]));
+console.log(findLHS([2, 2, 2, 2, 2, 2, 2, 3, 1, 0, 0, 0, 3, 1, -1, 0, 1, 1, 0, 0, 1, 1, 2, 2, 2, 0, 1, 2, 2, 3, 2])); //20
 
-console.log(findLHS([2, 3, 1, 1, 1]));
+console.log(findLHS([2, 3, 1, 1, 1])); //4
