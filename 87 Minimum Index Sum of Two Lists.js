@@ -40,6 +40,7 @@ Constraints:
     There is at least a common string between list1 and list2.
 */
 
+/*
 var findRestaurant = function (list1, list2) {
     let min = null;
     const obj = {};
@@ -62,6 +63,33 @@ var findRestaurant = function (list1, list2) {
         }
     }
     return obj[min];
+};
+*/
+
+var findRestaurant = function (list1, list2) {
+    let min = null;
+    const obj = {};
+    const res = {};
+    for (let i = 0; i < list1.length; i++) {
+        obj[list1[i]] = i;
+    }
+    for (let i = 0; i < list2.length; i++) {
+        const word = list2[i];
+        const wordList1Index = obj[word];
+        if (wordList1Index !== undefined) {
+            if (min === null) {
+                min = i + wordList1Index;
+            } else if (i + wordList1Index < min) {
+                min = i + wordList1Index;
+            }
+            if (!res[i + wordList1Index]) {
+                res[i + wordList1Index] = [word];
+            } else {
+                res[i + wordList1Index].push(word);
+            }
+        }
+    }
+    return res[min];
 };
 
 console.log(
