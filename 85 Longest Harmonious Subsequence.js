@@ -23,68 +23,49 @@ Constraints:
 */
 
 var findLHS = function (nums) {
-    const arr = [...nums];
-    arr.sort((a, b) => a - b);
-    console.log(arr);
-    const middle = Math.round(arr.length / 2);
-    const median = arr[middle];
-    //check median + 1
-    let arrPlus = [];
-    let arrPlusMin = null;
-    let arrPlusMax = null;
-
-    //check median - 1
-    let arrMinus = [];
-    let arrMinusMin = null;
-    let arrMinusMax = null;
-
+    let temp = 1;
+    let max = null;
+    let min = null;
+    let length = 0;
     for (let i = 0; i < nums.length; i++) {
-        const diff = nums[i] - median;
-        if (diff >= 0 && diff <= 1) {
-            arrPlus.push(nums[i]);
-            if (arrPlusMin === null) {
-                arrPlusMin = nums[i];
-            } else if (nums[i] < arrPlusMin) {
-                arrPlusMin = nums[i];
-            }
-            if (arrPlusMax === null) {
-                arrPlusMax = nums[i];
-            } else if (nums[i] > arrPlusMax) {
-                arrPlusMax = nums[i];
-            }
-        }
-        if (diff <= 0 && diff >= -1) {
-            arrMinus.push(nums[i]);
-            if (arrMinusMin === null) {
-                arrMinusMin = nums[i];
-            } else if (nums[i] < arrMinusMin) {
-                arrMinusMin = nums[i];
-            }
-            if (arrMinusMax === null) {
-                arrMinusMax = nums[i];
-            } else if (nums[i] > arrMinusMax) {
-                arrMinusMax = nums[i];
+        const check1 = nums[i];
+        console.log("check1 = " + check1);
+        for (let j = i + 1; j < nums.length; j++) {
+            const check2 = nums[j];
+            const diff = Math.abs(check1 - check2);
+            if (diff <= 1) {
+                console.log("check2 = " + check2 + " matches");
+                temp++;
+                if (max === null && min === null) {
+                    max = Math.max(check1, check2);
+                    min = Math.min(check1, check2);
+                }
+                if (check2 > max) {
+                    max = check2;
+                }
+                if (check2 < min) {
+                    min = check2;
+                }
             }
         }
+        console.log("max = " + max);
+        console.log("min = " + min);
+        console.log("temp = " + temp);
+        console.log("---------------------");
+        if (temp > length && max !== min) {
+            length = temp;
+        }
+        temp = 1;
+        max = null;
+        min = null;
     }
-    if (arrPlusMin === arrPlusMax) {
-        arrPlus = [];
-    }
-    if (arrMinusMin === arrMinusMax) {
-        arrMinus = [];
-    }
-    return Math.max(arrPlus.length, arrMinus.length);
-    // console.log(arrPlus);
-    // console.log(arrPlusMin);
-    // console.log(arrPlusMax);
-    // console.log("-----------------");
-    // console.log(arrMinus);
-    // console.log(arrMinusMin);
-    // console.log(arrMinusMax);
+    return length;
 };
 
-// console.log(findLHS([1, 3, 2, 2, 5, 2, 3, 7]));
-// console.log(findLHS([1, 2, 3, 4]));
-// console.log(findLHS([1, 1, 1, 1]));
+//console.log(findLHS([1, 3, 2, 2, 5, 2, 3, 7]));
+//console.log(findLHS([1, 2, 3, 4]));
+//console.log(findLHS([1, 1, 1, 1]));
 
-console.log(findLHS([1, 4, 1, 3, 1, -14, 1, -13]));
+// console.log(findLHS([1, 4, 1, 3, 1, -14, 1, -13]));
+
+console.log(findLHS([1, 2, 1, 3, 0, 0, 2, 2, 1, 3, 3]));
