@@ -54,9 +54,6 @@ var cancellable = function (fn, args, t) {
     return () => clearTimeout(timeout);
 };
 
-
-const arg
-
 /**
  *  const result = [];
  *
