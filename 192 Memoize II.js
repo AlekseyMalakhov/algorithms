@@ -152,22 +152,68 @@ function memoize(fn) {
         return notFound;
     };
     return function (...args) {
-        //console.log(cache);
-        let result = notFound;
-        const length = args.length;
-        //console.log("length = " + length);
-        if (cache.has(length)) {
-            const selectedCache = cache.get(length);
-            result = checkCache(args, selectedCache);
-        } else {
-            cache.set(length, new Map());
+        //we take arguments - if we have result for these arguments - we return the result
+        //if we don't have the ready made result - we calculate it, save it to memory
+        //and return
+
+        //we will save results in a tree like structure
+        //for every argument we will have a tree of possible next values
+        let selectedCacheLevel = cache;
+        for (let i = 0; i < args.length; i++) {
+            const currentArg = args[i];
+            //we check cashe for a current argument in a list of cache properties
+            //if we found it - we return the map of possible values for the next arguments
+            //if it is the last argument - we return the result
+
+            //if on one of the step we return notFound - then:
+            //1) if it is not the last argument - we create a new map in the current map with
+            //the key as current value. And enter it and continue as usual till the end
+            //in this case we will just create a new map on every step and in the end calculate the
+            //final result which we will return. It's because the whole tree is new and there is
+            //no any values there
+            //If it is the last argument we calculate the result and add it to the current map. and then
+            //return this result
+
+            //we better test it first on the primitive values where we can use has()
+            //and then write a custom has to chek if the property realy the same
+
+            //so let's go
+            //1)Check the cache on the current level if it has already made value. We don't use has() because
+            //in future it will be difficult to rewrite it for deep search
+
+            const result = checkCache(currentArg, selectedCacheLevel); //it's our has() implementation
+            if (result !== notFound) {
+                //we found something
+                if (i === args.length - 1) {
+                    //if currentArg is the last item, then we found a real result.
+                    //let's return it
+                    return result;
+                } else {
+                    // If it is not last, then it is a merely another level of cache, which we should search in
+                    selectedCacheLevel = result;
+                }
+            } else {
+                //if result is notFound
+                //if we check the whole list of properties of current map (in checkCache) and found nothing for our argument,
+                //it means we don't have anything for this argument and we should create the whole
+                //new branch for it
+                //if this item is a last one in the list of arguments, then we can simply calculate the result and add it to
+                //the current cache level, then return the result
+                if (i === args.length - 1) {
+                    const newResult = fn(...args);
+                    selectedCacheLevel.set(currentArg, newResult);
+                    return newResult;
+                } else {
+                    //if this item is not the last, then we should create the whole new branch in the cache and continue
+                    //go to the last item in array of arguments, and only then calculate the result, write it in
+                    //cache and return it
+                    const newMap = new Map();
+                    selectedCacheLevel.set(currentArg, newMap);
+                    //so create a new map, write it in the current selectedCacheLevel and dive in it
+                    selectedCacheLevel = newMap;
+                }
+            }
         }
-        if (result === notFound) {
-            result = fn(...args);
-            const selected = cache.get(length);
-            selected.set(args, result);
-        }
-        return result;
     };
 }
 
@@ -222,7 +268,7 @@ console.log(memoizedFn(o, o)); // {}
 console.log(memoizedFn(o, o)); // {}
 console.log(callCount); // 3
 */
-
+/*
 let callCount = 0;
 const memoizedFn = memoize(function (a) {
     callCount += 1;
@@ -238,3 +284,15 @@ console.log("------------undefined");
 console.log(memoizedFn(undefined)); //
 console.log("---------------");
 console.log(callCount);
+*/
+
+let callCount = 0;
+const memoizedFn = memoize(function (a) {
+    callCount += 1;
+    return a + 10;
+});
+console.log(memoizedFn(2)); // 12
+console.log(memoizedFn(2)); // 12
+console.log(memoizedFn(4)); // 14
+console.log(memoizedFn(2)); // 12
+console.log(callCount); // 2
