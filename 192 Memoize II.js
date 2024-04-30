@@ -152,16 +152,36 @@ function memoize(fn) {
         return notFound;
     };
     return function (...args) {
+        //console.log(args);
+        //console.log("args.length = " + args.length);
         //we take arguments - if we have result for these arguments - we return the result
         //if we don't have the ready made result - we calculate it, save it to memory
         //and return
 
         //we will save results in a tree like structure
         //for every argument we will have a tree of possible next values
-        let selectedCacheLevel = cache;
+
+        //one clarification: the same function can be called with any number of arguments
+        //so on the base level we should distinguish the same function which called with
+        //different number of arguments
+
+        let selectedCacheLevel;
+
+        const length = args.length;
+        if (cache.has(length)) {
+            selectedCacheLevel = cache.get(length);
+        } else {
+            selectedCacheLevel = new Map();
+            cache.set(length, selectedCacheLevel);
+        }
+        //console.log(cache);
+
+        //the following function we will need in a normal and in a corner case
+
+        //normal case
         for (let i = 0; i < args.length; i++) {
             const currentArg = args[i];
-            //we check cashe for a current argument in a list of cache properties
+            //we check cache for a current argument in a list of cache properties
             //if we found it - we return the map of possible values for the next arguments
             //if it is the last argument - we return the result
 
@@ -181,7 +201,14 @@ function memoize(fn) {
             //1)Check the cache on the current level if it has already made value. We don't use has() because
             //in future it will be difficult to rewrite it for deep search
 
+            //one clarification: the same function can be called with any number of arguments
+            //so on the base level we should distinguish the same function which called with
+            //different number of arguments
+
+            // console.log("currentArg = " + currentArg);
+
             const result = checkCache(currentArg, selectedCacheLevel); //it's our has() implementation
+            //console.log("result = " + result);
             if (result !== notFound) {
                 //we found something
                 if (i === args.length - 1) {
@@ -201,7 +228,10 @@ function memoize(fn) {
                 //the current cache level, then return the result
                 if (i === args.length - 1) {
                     const newResult = fn(...args);
+                    //console.log("newResult = " + newResult);
                     selectedCacheLevel.set(currentArg, newResult);
+                    // console.log("selectedCacheLevel");
+                    // console.log(selectedCacheLevel);
                     return newResult;
                 } else {
                     //if this item is not the last, then we should create the whole new branch in the cache and continue
@@ -212,6 +242,19 @@ function memoize(fn) {
                     //so create a new map, write it in the current selectedCacheLevel and dive in it
                     selectedCacheLevel = newMap;
                 }
+            }
+        }
+
+        //corner case - if length of arguments is 0
+        if (length === 0) {
+            const result = checkCache(undefined, cache);
+            if (result !== notFound) {
+                //we found something
+                return result;
+            } else {
+                const newResult = fn(...args);
+                cache.set(undefined, newResult);
+                return newResult;
             }
         }
     };
@@ -286,6 +329,7 @@ console.log("---------------");
 console.log(callCount);
 */
 
+/*
 let callCount = 0;
 const memoizedFn = memoize(function (a) {
     callCount += 1;
@@ -296,3 +340,71 @@ console.log(memoizedFn(2)); // 12
 console.log(memoizedFn(4)); // 14
 console.log(memoizedFn(2)); // 12
 console.log(callCount); // 2
+*/
+
+/*
+let callCount = 0;
+const memoizedFn = memoize(function (a, b) {
+    callCount += 1;
+    return a + b;
+});
+console.log(memoizedFn(2, 3)); // 5
+console.log(memoizedFn(2, 3)); // 5
+console.log(memoizedFn(2, 6)); // 8
+console.log(memoizedFn(2, 3)); // 5
+console.log(callCount); // 2
+*/
+
+/*
+let callCount = 0;
+const memoizedFn = memoize(function (a, b, c) {
+    callCount += 1;
+    return a + b + c;
+});
+console.log(memoizedFn(2, 3, 4)); // 9
+console.log(memoizedFn(2, 3, 4)); // 9
+console.log(memoizedFn(1, 6, 4)); // 11
+console.log(memoizedFn(2, 3, 4)); // 9
+console.log(callCount); // 2
+*/
+
+/*
+let callCount = 0;
+const memoizedFn = memoize(function (a, b, c) {
+    callCount += 1;
+    return a.value + b.value + c.value;
+});
+console.log(memoizedFn({ value: 2 }, { value: 3 }, { value: 4 })); // 9
+console.log(memoizedFn({ value: 2 }, { value: 3 }, { value: 4 })); // 9
+console.log(memoizedFn({ value: 1 }, { value: 6 }, { value: 4 })); // 11
+console.log(memoizedFn({ value: 2 }, { value: 3 }, { value: 4 })); // 9
+console.log(callCount); // 2
+*/
+
+/*
+let callCount = 0;
+const memoizedFn = memoize(function (...arr) {
+    // console.log("check func");
+    // console.log(arr);
+    callCount += 1;
+    return arr.reduce((a, b) => a + b, 0);
+});
+console.log(memoizedFn(1, 1, 1)); // 3
+console.log(memoizedFn(1, 1)); // 2
+console.log(memoizedFn(1)); // 1
+console.log(memoizedFn(1, 1)); // 2
+console.log(memoizedFn(1, 1, 1)); // 3
+console.log(callCount); // 3
+*/
+
+let callCount = 0;
+const memoizedFn = memoize(function (...arr) {
+    callCount += 1;
+    return arr.reduce((a, b) => a + b, 0);
+});
+console.log(memoizedFn()); // 0
+console.log(memoizedFn(1, 1)); // 2
+console.log(memoizedFn(1)); // 1
+console.log(memoizedFn(1, 1)); // 2
+console.log(memoizedFn(1, 1, 1)); // 3
+console.log(callCount); // 1
