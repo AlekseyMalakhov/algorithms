@@ -145,9 +145,9 @@ function memoize(fn) {
                 return x[1];
             }
             //else check deep
-            if (deepCompare(args, x[0]) === true) {
-                return x[1];
-            }
+            // if (deepCompare(args, x[0]) === true) {
+            //     return x[1];
+            // }
         }
         return notFound;
     };
@@ -207,9 +207,14 @@ function memoize(fn) {
 
             // console.log("currentArg = " + currentArg);
 
-            const result = checkCache(currentArg, selectedCacheLevel); //it's our has() implementation
-            //console.log("result = " + result);
+            //const result = checkCache(currentArg, selectedCacheLevel); //it's our has() implementation
+            const _check = selectedCacheLevel.has(currentArg);
+            let result = notFound;
+            if (_check === true) {
+                result = selectedCacheLevel.get(currentArg);
+            }
             if (result !== notFound) {
+                //console.log("result = " + result);
                 //we found something
                 if (i === args.length - 1) {
                     //if currentArg is the last item, then we found a real result.
@@ -368,7 +373,6 @@ console.log(memoizedFn(2, 3, 4)); // 9
 console.log(callCount); // 2
 */
 
-/*
 let callCount = 0;
 const memoizedFn = memoize(function (a, b, c) {
     callCount += 1;
@@ -379,7 +383,6 @@ console.log(memoizedFn({ value: 2 }, { value: 3 }, { value: 4 })); // 9
 console.log(memoizedFn({ value: 1 }, { value: 6 }, { value: 4 })); // 11
 console.log(memoizedFn({ value: 2 }, { value: 3 }, { value: 4 })); // 9
 console.log(callCount); // 2
-*/
 
 /*
 let callCount = 0;
@@ -397,6 +400,7 @@ console.log(memoizedFn(1, 1, 1)); // 3
 console.log(callCount); // 3
 */
 
+/*
 let callCount = 0;
 const memoizedFn = memoize(function (...arr) {
     callCount += 1;
@@ -408,3 +412,4 @@ console.log(memoizedFn(1)); // 1
 console.log(memoizedFn(1, 1)); // 2
 console.log(memoizedFn(1, 1, 1)); // 3
 console.log(callCount); // 1
+*/
