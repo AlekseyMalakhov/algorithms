@@ -112,20 +112,20 @@ Constraints:
     unique keys <= 1000
 */
 
-const getType = (val) => {
-    if (val === null) {
-        return "primitive";
-    }
-    if (Array.isArray(val)) {
-        return "array";
-    }
-    if (typeof val === "object") {
-        return "object";
-    }
-    return "primitive";
-};
-
 var jsonToMatrix = function (arr) {
+    const getType = (val) => {
+        if (val === null) {
+            return "primitive";
+        }
+        if (Array.isArray(val)) {
+            return "array";
+        }
+        if (typeof val === "object") {
+            return "object";
+        }
+        return "primitive";
+    };
+
     //get list of column names
     const matrix = {};
 
@@ -170,7 +170,7 @@ var jsonToMatrix = function (arr) {
                 getColumnNamesForObject(val[x], prop, index, length);
             }
             if (valType === "array") {
-                getColumnNamesForArray(val[i], prop, index, length);
+                getColumnNamesForArray(val[x], prop, index, length);
             }
         }
     }
@@ -187,7 +187,42 @@ var jsonToMatrix = function (arr) {
         }
     };
     getColumns(arr);
-    console.log(matrix);
+    //console.log(matrix);
+
+    const createMatrix = (matrix) => {
+        const length = Object.keys(matrix).length;
+        //corner case
+        if (length === 0) {
+            return Array(arr.length + 1).fill([], 0);
+        }
+
+        //normal case
+        const resultArr = [];
+        for (let x in matrix) {
+            const obj = {
+                column: x,
+                value: matrix[x],
+            };
+            resultArr.push(obj);
+        }
+        resultArr.sort((a, b) => a.column.localeCompare(b.column));
+
+        const newMatrix = [];
+        newMatrix[0] = [];
+        for (let i = 0; i < resultArr.length; i++) {
+            newMatrix[0].push(resultArr[i].column);
+            const value = resultArr[i].value;
+            for (let j = 0; j < value.length; j++) {
+                if (newMatrix[j + 1] === undefined) {
+                    newMatrix[j + 1] = [];
+                }
+                newMatrix[j + 1][i] = value[j];
+            }
+        }
+        return newMatrix;
+    };
+
+    return createMatrix(matrix);
 };
 
 console.log(
@@ -200,4 +235,4 @@ console.log(
 console.log(jsonToMatrix([{ a: 1, b: 2 }, { c: 3, d: 4 }, {}]));
 console.log(jsonToMatrix([{ a: { b: 1, c: 2 } }, { a: { b: 3, d: 4 } }]));
 console.log(jsonToMatrix([[{ a: null }], [{ b: true }], [{ c: "x" }]]));
-// console.log(jsonToMatrix([{}, {}, {}]));
+console.log(jsonToMatrix([{}, {}, {}]));
