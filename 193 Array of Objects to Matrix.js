@@ -129,6 +129,29 @@ var jsonToMatrix = function (arr) {
     //get list of column names
     const matrix = {};
 
+    function getColumnNamesForArray(val, prev, index, length) {
+        for (let i = 0; i < val.length; i++) {
+            let prop = i;
+            if (prev !== undefined) {
+                prop = prev + "." + i;
+            }
+            const valType = getType(val[i]);
+            if (valType === "primitive") {
+                if (matrix[prop] === undefined) {
+                    //create an array of specified length filled with empty strings
+                    matrix[prop] = Array(length).fill("", 0);
+                }
+                matrix[prop][index] = val[i];
+            }
+            if (valType === "object") {
+                getColumnNamesForObject(val[i], prop, index, length);
+            }
+            if (valType === "array") {
+                getColumnNamesForArray(val[i], prop, index, length);
+            }
+        }
+    }
+
     function getColumnNamesForObject(val, prev, index, length) {
         for (let x in val) {
             let prop = x;
@@ -146,22 +169,24 @@ var jsonToMatrix = function (arr) {
             if (valType === "object") {
                 getColumnNamesForObject(val[x], prop, index, length);
             }
+            if (valType === "array") {
+                getColumnNamesForArray(val[i], prop, index, length);
+            }
         }
     }
 
-    const getColumnNames = (val, index, length) => {
-        const type = getType(val);
-        if (type === "array") {
-            //do some array staff
-            for (let i = 0; i < val.length; i++) {
+    const getColumns = (val) => {
+        for (let i = 0; i < val.length; i++) {
+            const valType = getType(val[i]);
+            if (valType === "object") {
                 getColumnNamesForObject(val[i], undefined, i, val.length);
             }
+            if (valType === "array") {
+                getColumnNamesForArray(val[i], undefined, i, val.length);
+            }
         }
-        // if (type === "object") {
-        //     getColumnNamesForObject(val);
-        // }
     };
-    getColumnNames(arr);
+    getColumns(arr);
     console.log(matrix);
 };
 
@@ -174,5 +199,5 @@ console.log(
 
 console.log(jsonToMatrix([{ a: 1, b: 2 }, { c: 3, d: 4 }, {}]));
 console.log(jsonToMatrix([{ a: { b: 1, c: 2 } }, { a: { b: 3, d: 4 } }]));
-// console.log(jsonToMatrix([[{ a: null }], [{ b: true }], [{ c: "x" }]]));
+console.log(jsonToMatrix([[{ a: null }], [{ b: true }], [{ c: "x" }]]));
 // console.log(jsonToMatrix([{}, {}, {}]));
