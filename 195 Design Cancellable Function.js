@@ -127,21 +127,31 @@ Constraints:
 
 var cancellable = function (generator) {
     const cancel = () => {
-        //console.log("canc");
-        //generator.return("Cancelled 123");
+        console.log("canc");
+        generator.return();
     };
 
     const run = (nextStep) => {
+        console.log("nextStep = " + JSON.stringify(nextStep));
         return new Promise((resolve, reject) => {
             if (!nextStep.done) {
                 nextStep.value.then((res) => {
                     console.log("res 1 = " + res);
-                    const nextGenStep = generator.next(res);
-                    run(nextGenStep).then((res) => resolve(res));
+                    try {
+                        const nextGenStep = generator.next(res);
+                        run(nextGenStep)
+                            .then((res) => resolve(res))
+                            .catch((err) => reject(err));
+                    } catch (error) {
+                        reject(error);
+                    }
                 });
             } else {
-                console.log("oh no it's done");
-                resolve(nextStep.value);
+                if (nextStep.value === undefined) {
+                    reject("Cancelled");
+                } else {
+                    resolve(nextStep.value);
+                }
             }
         });
     };
@@ -150,11 +160,11 @@ var cancellable = function (generator) {
         const nextStep = generator.next();
         run(nextStep)
             .then((res) => {
-                console.log("res 2435435" + res);
+                console.log("res lala = " + res);
                 resolve(res);
             })
             .catch((err) => {
-                console.log("err 4534543" + err);
+                console.log("err lala = " + err);
                 reject(err);
             });
     });
@@ -162,6 +172,7 @@ var cancellable = function (generator) {
     return [cancel, promise];
 };
 
+/*
 function* tasks() {
     const val = yield new Promise((resolve) => resolve(2 + 2));
     //console.log("we got value = " + val);
@@ -171,3 +182,40 @@ function* tasks() {
 const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, 50);
 promise.catch(console.log); // logs "Cancelled" at t=50ms
+*/
+/*
+function* tasks() {
+    return 42;
+}
+const [cancel, promise] = cancellable(tasks());
+setTimeout(cancel, 100);
+promise.catch(console.log); // logs "Cancelled" at t=50ms
+*/
+
+function* tasks() {
+    const msg = yield new Promise((res) => res("Hello"));
+    throw `Error: ${msg}`;
+}
+const [cancel, promise] = cancellable(tasks());
+setTimeout(cancel, null);
+promise.catch(console.log); // logs "Cancelled" at t=50ms
+
+/*
+function* tasks() {
+    let result = 0;
+    try {
+        yield new Promise((res) => setTimeout(res, 100));
+        result += yield new Promise((res) => res(1));
+        yield new Promise((res) => setTimeout(res, 100));
+        result += yield new Promise((res) => res(1));
+    } catch (e) {
+        console.log("keke error = " + e);
+        console.log("result = " + result);
+        return result;
+    }
+    return result;
+}
+const [cancel, promise] = cancellable(tasks());
+setTimeout(cancel, 150);
+promise.catch(console.log); // logs "Cancelled" at t=50ms
+*/
