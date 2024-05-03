@@ -156,18 +156,8 @@ var cancellable = function (generator) {
         });
     };
 
-    const promise = new Promise((resolve, reject) => {
-        const nextStep = generator.next();
-        run(nextStep)
-            .then((res) => {
-                console.log("res lala = " + res);
-                resolve(res);
-            })
-            .catch((err) => {
-                console.log("err lala = " + err);
-                reject(err);
-            });
-    });
+    const nextStep = generator.next();
+    const promise = run(nextStep);
 
     return [cancel, promise];
 };
