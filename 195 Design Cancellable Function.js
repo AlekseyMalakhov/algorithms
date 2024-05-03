@@ -181,7 +181,7 @@ const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, 100);
 promise.catch(console.log); // logs "Cancelled" at t=50ms
 */
-
+/*
 function* tasks() {
     const msg = yield new Promise((res) => res("Hello"));
     throw `Error: ${msg}`;
@@ -189,8 +189,8 @@ function* tasks() {
 const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, null);
 promise.catch(console.log); // logs "Cancelled" at t=50ms
+*/
 
-/*
 function* tasks() {
     let result = 0;
     try {
@@ -208,4 +208,3 @@ function* tasks() {
 const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, 150);
 promise.catch(console.log); // logs "Cancelled" at t=50ms
-*/
