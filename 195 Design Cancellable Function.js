@@ -126,22 +126,41 @@ Constraints:
 */
 
 var cancellable = function (generator) {
+    let cancelResult;
     const cancel = () => {
         console.log("canc");
-        generator.return();
+        const res = generator.throw("leleel123");
+        cancelResult = res.value;
+        console.log("this res I got in cancel " + JSON.stringify(res));
     };
+    let p = 0;
 
     const run = (nextStep) => {
         console.log("nextStep = " + JSON.stringify(nextStep));
+        //run always returns a promise
         return new Promise((resolve, reject) => {
+            //if there are some tasks in a list
             if (!nextStep.done) {
+                //run the promise
                 nextStep.value.then((res) => {
-                    console.log("res 1 = " + res);
+                    //get the new value
+                    console.log("P " + p + " is finished");
+                    console.log("res P" + p + " = " + res);
                     try {
+                        //get next promise in the list
+                        console.log("Call generators next()");
                         const nextGenStep = generator.next(res);
-                        run(nextGenStep)
-                            .then((res) => resolve(res))
-                            .catch((err) => reject(err));
+                        p++;
+                        console.log("P = " + p);
+                        //create a new promise with this result
+                        if (cancelResult !== undefined) {
+                            console.log("we go here " + cancelResult);
+                            resolve(cancelResult);
+                        } else {
+                            run(nextGenStep)
+                                .then((res) => resolve(res))
+                                .catch((err) => reject(err));
+                        }
                     } catch (error) {
                         reject(error);
                     }
@@ -153,14 +172,63 @@ var cancellable = function (generator) {
                     resolve(nextStep.value);
                 }
             }
+            console.log("-------------------------------------");
         });
     };
 
-    const nextStep = generator.next();
-    const promise = run(nextStep);
+    //we come to the first yield in promise
+    p++;
+    console.log("Call generators next()");
+    const nextStep = generator.next(); //next step is a promise, because this generator returns a promise
+    console.log("P = " + p);
+    const promise = run(nextStep); //then we run next step
 
     return [cancel, promise];
 };
+
+/*
+Step by step execution
+1) run generator function - come to the first yield
+2) yeild1 retuns a new Promise(res => setTimeout(res, 100)) to nextStep. Lets call it P1
+3) nextStep is put into the run function with nextStep
+4) we create a new promise and return it to the outer world. Let's call it Main Promise
+5) in the outer world we run Main Promise using .catch(). Main Promise begins executing
+6) we execute function inside the promise - as nextStep.done (means P1) is not true we execute it
+using.then() method. We get result from the P1 promise - it's undefined
+7) We continue to execute generator. Call it with next(). yeild2 returns new Promise(res => res(1)) let's call it P2
+8)P2 is put into run function and executed using then()
+9) run creates a new promice which in this case NOT RETURN TO ANYWHERE. We need it only to execute using then
+10) So we execute it using then() P2.done is false so we run the P2 using then(). res of P2 returns to the then
+and now we see that res = 1.
+11) We run the generator again using next(). In next we provide result of P2 means 1 so in generator 1 is assign
+to result variable and now result in generator = 1.
+12) we come to the yield3 and it returns new Promise(res => setTimeout(res, 100)); let's call it P3
+13) We pass it to the run function and run it using then()
+14) As p3 done is false we create a new Promice and run it using previously called then()
+15) We call P3.then() and get res which is undefined
+16) We provide this result to the next() generator function
+17) this result is not assigned to anything
+18) We come to the yeild4 which returns new Promise(res => res(1)); we will call it P4
+19) We run p4 in run using then, but p4.done is true so we call reject with word "Cancelled"
+20) Reject through the promises goes up to the Main Promise and catch it saying "Top catch says = Cancelled"
+So we see, cancel not influence generator execution in any way. We want calling cancel in our run function
+will generate an error which will be caught in th generator itself thus ending in return of result which is 1
+
+so FIND A WAY TO GENERATE ERROR IN THE GENERATOR FROM THE OUTSIDE of THE GENERATOR
+I think it should be a .throw() method
+
+So when cancel function is fired it should insert a throw in the suspended generator
+Ok. by throwing the error we managed to stop generator execution and 
+activate catch branch
+
+But how to return this value back to promise? In our promice we continue to execute P4 and return Cancel instead of result from generator
+
+
+A return statement in a generator, when executed, will make the generator finish (i.e. the done property of the object returned by it will be set to true). 
+If a value is returned, it will be set as the value property of the object returned by the generator.
+
+
+*/
 
 /*
 function* tasks() {
@@ -196,15 +264,17 @@ function* tasks() {
     try {
         yield new Promise((res) => setTimeout(res, 100));
         result += yield new Promise((res) => res(1));
+        console.log("this code is executing 1");
         yield new Promise((res) => setTimeout(res, 100));
+        console.log("this code is executing 2");
         result += yield new Promise((res) => res(1));
     } catch (e) {
         console.log("keke error = " + e);
-        console.log("result = " + result);
+        console.log("result in generator = " + result);
         return result;
     }
     return result;
 }
 const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, 150);
-promise.catch(console.log); // logs "Cancelled" at t=50ms
+promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
