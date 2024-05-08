@@ -89,18 +89,32 @@ function MyPromise(func) {
     let status = "pending";
     let result;
     function resolve(onResolved, res) {
+        //pass result to 1st then function
         result = onResolved(res);
         status = "resolved";
     }
     function reject(onRejected, res) {
+        //pass result to 2nd then function
         result = onRejected(res);
         status = "rejected";
     }
+    function rejectInNextCatch(res) {
+        //pass rejected res to the next promise with catch
+        result = res;
+        status = "rejected";
+    }
     this.then = function (onResolved, onRejected) {
-        func(
-            (res) => resolve(onResolved, res),
-            (res) => reject(onRejected, res)
-        );
+        if (onRejected === undefined) {
+            func(
+                (res) => resolve(onResolved, res),
+                (res) => rejectInNextCatch(res)
+            );
+        } else {
+            func(
+                (res) => resolve(onResolved, res),
+                (res) => reject(onRejected, res)
+            );
+        }
         return new MyPromise((resProm, rejProm) => {
             if (status === "resolved") {
                 resProm(result);
@@ -109,6 +123,9 @@ function MyPromise(func) {
                 rejProm(result);
             }
         });
+    };
+    this.catch = function (onRejectedInCatch) {
+        func(null, (res) => onRejectedInCatch(res));
     };
 }
 
@@ -121,13 +138,16 @@ myProm
         (res) => {
             console.log("res resolved = " + res);
             return res + 10;
-        },
-        (res) => {
-            console.log("res rejected = " + res);
-            return res + 10;
         }
+        // (res) => {
+        //     console.log("res rejected = " + res);
+        //     return res + 10;
+        // }
     )
-    .then(
-        (res) => console.log("second res = " + res),
-        (res) => console.log("second rejected = " + res)
-    );
+    .catch((res) => {
+        console.log("rejected in next catch = " + res);
+    });
+// .then(
+//     (res) => console.log("second res = " + res),
+//     (res) => console.log("second rejected = " + res)
+// );
