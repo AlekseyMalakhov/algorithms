@@ -125,7 +125,17 @@ function MyPromise(func) {
         });
     };
     this.catch = function (onRejectedInCatch) {
-        func(null, (res) => onRejectedInCatch(res));
+        func(null, (res) => {
+            result = onRejectedInCatch(res);
+        });
+        return new MyPromise((resProm, rejProm) => {
+            if (status === "resolved") {
+                resProm(result);
+            }
+            if (status === "rejected") {
+                rejProm(result);
+            }
+        });
     };
 }
 
