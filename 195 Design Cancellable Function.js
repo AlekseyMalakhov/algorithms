@@ -128,10 +128,18 @@ Constraints:
 var cancellable = function (generator) {
     let cancelResult;
     const cancel = () => {
-        console.log("canc");
-        const res = generator.throw("leleel123");
-        cancelResult = res.value;
-        console.log("this res I got in cancel " + JSON.stringify(res));
+        try {
+            console.log("canc");
+            const res = generator.throw();
+            cancelResult = res.value;
+            console.log("this res I got in cancel " + JSON.stringify(res));
+        } catch (error) {
+            console.log("ohohohoh");
+            console.log("canc");
+            const res = generator.return();
+            cancelResult = res.value;
+            console.log("this res I got in cancel " + JSON.stringify(res));
+        }
     };
     let p = 0;
 
@@ -229,7 +237,6 @@ If a value is returned, it will be set as the value property of the object retur
 
 
 */
-
 /*
 function* tasks() {
     const val = yield new Promise((resolve) => resolve(2 + 2));
@@ -241,6 +248,7 @@ const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, 50);
 promise.catch(console.log); // logs "Cancelled" at t=50ms
 */
+
 /*
 function* tasks() {
     return 42;
