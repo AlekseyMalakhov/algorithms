@@ -1,4 +1,5 @@
 //Promise polyfill
+/*
 
 function MyPromise(func) {
     let status = "pending";
@@ -70,3 +71,40 @@ normalPromise
     })
     .finally((res) => console.log("result in finally normal " + res));
     */
+
+/*
+const normalPromise = new Promise((resolve, reject) => {
+    setTimeout(() => resolve(27), 50);
+});
+console.log(normalPromise);
+
+normalPromise.then((res) => {
+    console.log("resolved normal " + res);
+});
+*/
+
+//state: pending, resolved, rejected
+
+function MyPromise(func) {
+    let result;
+    function resolve(onResolved, res) {
+        result = onResolved(res);
+    }
+    this.then = function (onResolved) {
+        func((res) => resolve(onResolved, res));
+        return new MyPromise((resProm, rejProm) => {
+            resProm(result);
+        });
+    };
+}
+
+const myProm = new MyPromise((resProm, rejProm) => {
+    resProm(25);
+});
+//console.log(myProm);
+myProm
+    .then((res) => {
+        console.log("res = " + res);
+        return res + 10;
+    })
+    .then((res) => console.log("second res = " + res));
