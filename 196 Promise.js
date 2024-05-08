@@ -86,12 +86,15 @@ normalPromise.then((res) => {
 //state: pending, resolved, rejected
 
 function MyPromise(func) {
+    let status = "pending";
     let result;
     function resolve(onResolved, res) {
         result = onResolved(res);
+        status = "resolved";
     }
     function reject(onRejected, res) {
         result = onRejected(res);
+        status = "rejected";
     }
     this.then = function (onResolved, onRejected) {
         func(
@@ -99,13 +102,18 @@ function MyPromise(func) {
             (res) => reject(onRejected, res)
         );
         return new MyPromise((resProm, rejProm) => {
-            resProm(result);
+            if (status === "resolved") {
+                resProm(result);
+            }
+            if (status === "rejected") {
+                rejProm(result);
+            }
         });
     };
 }
 
 const myProm = new MyPromise((resProm, rejProm) => {
-    resProm(25);
+    rejProm(25);
 });
 //console.log(myProm);
 myProm
@@ -119,4 +127,7 @@ myProm
             return res + 10;
         }
     )
-    .then((res) => console.log("second res = " + res));
+    .then(
+        (res) => console.log("second res = " + res),
+        (res) => console.log("second rejected = " + res)
+    );
