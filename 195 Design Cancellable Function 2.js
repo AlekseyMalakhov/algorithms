@@ -1,20 +1,43 @@
 var cancellable = function (generator) {
-    function cancel() {}
+    function cancel() {
+        //If the cancel callback is called before the generator is done, your function should throw an error back to the generator
+        generator.throw("Cancelled");
+    }
 
-    function run(nextStep) {
+    function getPromise() {
         //run should return a Main Promise
         return new Promise((resolve, reject) => {
-            if (!nextStep) {
-                //if it is the first next
-                //we return a promise
-                const prom = generator.next();
-                //now we should run this promise and check what happens
-                prom.then((res) => {}).catch((err) => {});
-            }
+            const run = (valToNext) => {
+                try {
+                    //run next with the previous value
+                    const nextStep = generator.next(valToNext);
+                    //we get nextStep {"value":{},"done":false}
+                    //value contains a promise which we should run
+                    if (!nextStep.done) {
+                        //if generator is not done, yield the next value
+                        nextStep.value
+                            .then((res) => {
+                                //put result into the next next()
+                                run(res);
+                            })
+                            .catch((err) => {
+                                //If the promise rejects, function should throw that error back to the generator
+                                generator.throw(err);
+                            });
+                    } else {
+                        // if gen is done - return the value gen returned
+                        resolve(nextStep.value);
+                    }
+                } catch (error) {
+                    //If the generator throws an error, the returned promise should reject with the error.
+                    reject(error);
+                }
+            };
+            run();
         });
     }
 
-    const promise = run();
+    const promise = getPromise();
 
     return [cancel, promise];
 };
