@@ -150,14 +150,35 @@ var cancellable = function (generator) {
             //if there are some tasks in a list
             if (!nextStep.done) {
                 //run the promise
-                nextStep.value.then((res) => {
-                    //get the new value
-                    console.log("P " + p + " is finished");
-                    console.log("res P" + p + " = " + res);
-                    try {
-                        //get next promise in the list
-                        console.log("Call generators next()");
-                        const nextGenStep = generator.next(res);
+                nextStep.value
+                    .then((res) => {
+                        //get the new value
+                        console.log("P " + p + " is finished");
+                        console.log("res P" + p + " = " + res);
+                        try {
+                            //get next promise in the list
+                            console.log("Call generators next()");
+                            const nextGenStep = generator.next(res);
+                            p++;
+                            console.log("P = " + p);
+                            //create a new promise with this result
+                            if (cancelResult !== undefined) {
+                                console.log("we go here " + cancelResult);
+                                resolve(cancelResult);
+                            } else {
+                                run(nextGenStep)
+                                    .then((res) => resolve(res))
+                                    .catch((err) => reject(err));
+                            }
+                        } catch (error) {
+                            reject(error);
+                        }
+                    })
+                    .catch((err) => {
+                        console.log("Call generators next() after error");
+                        const res = generator.throw();
+                        console.log("res after throw is = " + JSON.stringify(res));
+                        const nextGenStep = generator.next();
                         p++;
                         console.log("P = " + p);
                         //create a new promise with this result
@@ -165,14 +186,11 @@ var cancellable = function (generator) {
                             console.log("we go here " + cancelResult);
                             resolve(cancelResult);
                         } else {
-                            run(nextGenStep)
-                                .then((res) => resolve(res))
-                                .catch((err) => reject(err));
+                            run(nextGenStep);
+                            // .then((res) => resolve(res))
+                            // .catch((err) => reject(err));
                         }
-                    } catch (error) {
-                        reject(error);
-                    }
-                });
+                    });
             } else {
                 if (nextStep.value === undefined) {
                     reject("Cancelled");
@@ -266,7 +284,7 @@ const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, null);
 promise.catch(console.log); // logs "Cancelled" at t=50ms
 */
-
+/*
 function* tasks() {
     let result = 0;
     try {
@@ -286,3 +304,24 @@ function* tasks() {
 const [cancel, promise] = cancellable(tasks());
 setTimeout(cancel, 150);
 promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
+*/
+
+function* tasks() {
+    try {
+        yield new Promise((resolve, reject) => reject("Promise Rejected"));
+    } catch (e) {
+        let a = yield new Promise((resolve) => resolve(2));
+        console.log("a = " + a);
+        let b = yield new Promise((resolve) => resolve(2));
+        console.log("a = " + a);
+        console.log("b = " + b);
+        return a + b;
+    }
+}
+const [cancel, promise] = cancellable(tasks());
+//setTimeout(cancel, 150);
+promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
+
+//we run first next and got our Main Promise new Promise((resolve, reject) => reject("Promise Rejected"));
+//we put it in run and run it using then() in main promise.then() line
+//this promise rejects
