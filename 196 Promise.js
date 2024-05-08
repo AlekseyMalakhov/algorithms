@@ -90,8 +90,14 @@ function MyPromise(func) {
     function resolve(onResolved, res) {
         result = onResolved(res);
     }
-    this.then = function (onResolved) {
-        func((res) => resolve(onResolved, res));
+    function reject(onRejected, res) {
+        result = onRejected(res);
+    }
+    this.then = function (onResolved, onRejected) {
+        func(
+            (res) => resolve(onResolved, res),
+            (res) => reject(onRejected, res)
+        );
         return new MyPromise((resProm, rejProm) => {
             resProm(result);
         });
@@ -103,8 +109,14 @@ const myProm = new MyPromise((resProm, rejProm) => {
 });
 //console.log(myProm);
 myProm
-    .then((res) => {
-        console.log("res = " + res);
-        return res + 10;
-    })
+    .then(
+        (res) => {
+            console.log("res resolved = " + res);
+            return res + 10;
+        },
+        (res) => {
+            console.log("res rejected = " + res);
+            return res + 10;
+        }
+    )
     .then((res) => console.log("second res = " + res));
