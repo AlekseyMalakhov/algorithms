@@ -45,16 +45,21 @@ var cancellable = function (generator) {
                                 console.log("we are here 1");
                                 try {
                                     const res = generator.throw(err);
-                                    res.value
-                                        .then((res) => {
-                                            //put result into the next next()
-                                            console.log("we are here 6");
-                                            run(res);
-                                        })
-                                        .catch((err) => {
-                                            console.log("we are here 7");
-                                            generator.throw(err);
-                                        });
+                                    console.log("here res is " + JSON.stringify(res));
+                                    if (res.done) {
+                                        resolve(res.value);
+                                    } else {
+                                        res.value
+                                            .then((res) => {
+                                                //put result into the next next()
+                                                console.log("we are here 6");
+                                                run(res);
+                                            })
+                                            .catch((err) => {
+                                                console.log("we are here 7");
+                                                generator.throw(err);
+                                            });
+                                    }
                                 } catch (error) {
                                     reject(error);
                                     return;
@@ -182,8 +187,23 @@ setTimeout(cancel, 100);
 promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
 */
 
+/*
 function* tasks() {
     yield new Promise((resolve, reject) => reject("Promise Rejected"));
+}
+const [cancel, promise] = cancellable(tasks());
+//setTimeout(cancel, 100);
+promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
+*/
+
+function* tasks() {
+    try {
+        yield new Promise((res) => setTimeout(res, 200));
+        yield new Promise((resolve, reject) => reject("Promise Rejected"));
+    } catch (e) {
+        return e;
+    }
+    return "Hi";
 }
 const [cancel, promise] = cancellable(tasks());
 //setTimeout(cancel, 100);
