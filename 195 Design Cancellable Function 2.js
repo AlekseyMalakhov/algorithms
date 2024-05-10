@@ -7,12 +7,12 @@ var cancellable = function (generator) {
         try {
             res = generator.throw("Cancelled");
             cancelResult = res.value;
-            console.log("cancel result threw and was caught in generator = " + cancelResult);
+            //console.log("cancel result threw and was caught in generator = " + cancelResult);
         } catch (error) {
             // const res = generator.return("Cancelled");
-            console.log("error = " + error);
+            //console.log("error = " + error);
             cancelResultError = error;
-            console.log("cancel result threw and was MOT caught in generator = " + cancelResultError);
+            //console.log("cancel result threw and was MOT caught in generator = " + cancelResultError);
         }
     }
 
@@ -31,39 +31,45 @@ var cancellable = function (generator) {
                     //we get nextStep {"value":{},"done":false}
                     //value contains a promise which we should run
                     if (!nextStep.done) {
-                        console.log(nextStep);
-                        console.log("we are here 8");
+                        //console.log(nextStep);
+                        //console.log("we are here 8");
                         //if generator is not done, yield the next value
                         nextStep.value
                             .then((res) => {
                                 //put result into the next next()
-                                console.log("we are here 4");
+                                //console.log("we are here 4");
                                 run(res);
                             })
-                            .catch((err) => {
+                            .catch((error) => {
                                 //If the promise rejects, function should throw that error back to the generator
-                                console.log("we are here 1");
-                                try {
-                                    const res = generator.throw(err);
-                                    console.log("here res is " + JSON.stringify(res));
-                                    if (res.done) {
-                                        resolve(res.value);
-                                    } else {
-                                        res.value
-                                            .then((res) => {
-                                                //put result into the next next()
-                                                console.log("we are here 6");
-                                                run(res);
-                                            })
-                                            .catch((err) => {
-                                                console.log("we are here 7");
-                                                generator.throw(err);
-                                            });
+                                //console.log("we are here 1");
+
+                                const throwError = (err) => {
+                                    try {
+                                        const res = generator.throw(err);
+                                        //console.log("here res is " + JSON.stringify(res));
+                                        if (res.done) {
+                                            resolve(res.value);
+                                        } else {
+                                            //transform any value to a promise and call it
+                                            const resProm = Promise.resolve(res.value);
+                                            resProm
+                                                .then((res) => {
+                                                    //put result into the next next()
+                                                    //console.log("we are here 6");
+                                                    run(res);
+                                                })
+                                                .catch((err) => {
+                                                    //console.log("we are here 7");
+                                                    throwError(err);
+                                                });
+                                        }
+                                    } catch (err) {
+                                        reject(err);
+                                        return;
                                     }
-                                } catch (error) {
-                                    reject(error);
-                                    return;
-                                }
+                                };
+                                throwError(error);
 
                                 //console.log(res.value);
                                 //and try to start again
@@ -71,17 +77,17 @@ var cancellable = function (generator) {
                     } else {
                         // if gen is done - return the value gen returned
                         if (cancelResult === undefined) {
-                            console.log("we are here 10");
+                            //console.log("we are here 10");
                             resolve(nextStep.value);
                         } else {
-                            console.log("we are here 11");
+                            //console.log("we are here 11");
                             resolve(cancelResult);
                         }
                     }
                 } catch (error) {
                     //If the generator throws an error, the returned promise should reject with the error.
                     //console.log(error);
-                    console.log("we are here 2");
+                    //console.log("we are here 2");
                     reject(error);
                 }
             };
@@ -196,12 +202,32 @@ const [cancel, promise] = cancellable(tasks());
 promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
 */
 
+/*
 function* tasks() {
     try {
         yield new Promise((res) => setTimeout(res, 200));
         yield new Promise((resolve, reject) => reject("Promise Rejected"));
     } catch (e) {
         return e;
+    }
+    return "Hi";
+}
+const [cancel, promise] = cancellable(tasks());
+//setTimeout(cancel, 100);
+promise.then((res) => console.log("Top then says = " + res)).catch((err) => console.log("Top catch says = " + err)); // logs "Cancelled" at t=50ms
+*/
+
+function* tasks() {
+    try {
+        yield new Promise((resolve, reject) => reject("Promise Rejected"));
+    } catch (e) {
+        try {
+            yield new Promise((resolve, reject) => reject("Promise Rejected"));
+        } catch (e) {
+            let a = yield new Promise((resolve) => resolve(2));
+            let b = yield new Promise((resolve) => resolve(2));
+            return a + b;
+        }
     }
     return "Hi";
 }
