@@ -1,6 +1,6 @@
-{
-    "super": {
-        "koko": [34, "35", null]
-    },
-    "kola": "gege"
-}
+[
+    ["ololo", "keke"],
+    {
+        "zaza": 25
+    }
+]

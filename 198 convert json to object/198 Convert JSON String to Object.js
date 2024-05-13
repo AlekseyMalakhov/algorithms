@@ -27,22 +27,56 @@ Constraints:
     1 <= str.length <= 105
 */
 
-const getType = (val) => {
-    if (val === null) {
-        return "primitive";
+const getNewArr = (str) => {
+    const arr = [];
+    let arrN = 0;
+    let objN = 0;
+    let temp = "";
+    for (let i = 0; i < str.length; i++) {
+        const letter = str[i];
+        temp = temp + letter;
+        if (letter === "[") {
+            //array begins
+            arrN++;
+        }
+        if (letter === "{") {
+            //array begins
+            objN++;
+        }
+
+        if (letter === "]") {
+            //array finishes
+            arrN--;
+            //if all nested arrays are closed - push it in the newArr
+            if (arrN === 0 && objN === 0) {
+                arr.push(temp);
+                temp = "";
+            }
+        }
+        if (letter === "}") {
+            //object finishes
+            objN--;
+            //if all nested objects are closed - push it in the newArr
+            if (arrN === 0 && objN === 0) {
+                arr.push(temp);
+                temp = "";
+            }
+        }
     }
-    if (Array.isArray(val)) {
-        return "array";
+    if (temp !== "" && temp !== "\r\n") {
+        arr.push(temp);
     }
-    if (typeof val === "object") {
-        return "object";
-    }
-    return "primitive";
+    return arr;
 };
 
 var jsonParse = function (str) {
     const recursion = (dataStr) => {
-        const strPart = dataStr.trim();
+        let strPart = dataStr.trim();
+        if (strPart[0] === ",") {
+            //remove unnecessary comma
+            strPart = strPart.slice(1);
+            strPart = strPart.trim();
+        }
         console.log("dataStr after trim");
         console.log(strPart);
         if (strPart[0] === "[" && strPart[strPart.length - 1] === "]") {
@@ -56,12 +90,13 @@ var jsonParse = function (str) {
             console.log(newStr.length);
             if (newStr.length > 0) {
                 //if there are letters inside - split it to items and push them into the array
-                console.log("some check");
-                console.log(newStr.split(","));
-                const newArr = newStr.split(",").map((item) => recursion(item));
+                //console.log("some check");
+                //console.log(newStr.split(","));
+                //const newArr = newStr.split(",").map((item) => recursion(item));
+                const newArr = getNewArr(newStr);
                 console.log("newArr = ");
                 console.log(newArr);
-                return newArr;
+                return newArr.map((item) => recursion(item));
             } else {
                 return [];
             }
@@ -77,44 +112,44 @@ var jsonParse = function (str) {
             //console.log(newStr.length);
             if (newStr.length > 0) {
                 //const newArr = newStr.split(",");
-                const newArr = [];
-                let arrN = 0;
-                let objN = 0;
-                let temp = "";
-                for (let i = 0; i < newStr.length; i++) {
-                    const letter = newStr[i];
-                    temp = temp + letter;
-                    if (letter === "[") {
-                        //array begins
-                        arrN++;
-                    }
-                    if (letter === "{") {
-                        //array begins
-                        objN++;
-                    }
+                const newArr = getNewArr(newStr);
+                // let arrN = 0;
+                // let objN = 0;
+                // let temp = "";
+                // for (let i = 0; i < newStr.length; i++) {
+                //     const letter = newStr[i];
+                //     temp = temp + letter;
+                //     if (letter === "[") {
+                //         //array begins
+                //         arrN++;
+                //     }
+                //     if (letter === "{") {
+                //         //array begins
+                //         objN++;
+                //     }
 
-                    if (letter === "]") {
-                        //array finishes
-                        arrN--;
-                        //if all nested arrays are closed - push it in the newArr
-                        if (arrN === 0 && objN === 0) {
-                            newArr.push(temp);
-                            temp = "";
-                        }
-                    }
-                    if (letter === "}") {
-                        //object finishes
-                        objN--;
-                        //if all nested objects are closed - push it in the newArr
-                        if (arrN === 0 && objN === 0) {
-                            newArr.push(temp);
-                            temp = "";
-                        }
-                    }
-                }
-                if (temp !== "") {
-                    newArr.push(temp);
-                }
+                //     if (letter === "]") {
+                //         //array finishes
+                //         arrN--;
+                //         //if all nested arrays are closed - push it in the newArr
+                //         if (arrN === 0 && objN === 0) {
+                //             newArr.push(temp);
+                //             temp = "";
+                //         }
+                //     }
+                //     if (letter === "}") {
+                //         //object finishes
+                //         objN--;
+                //         //if all nested objects are closed - push it in the newArr
+                //         if (arrN === 0 && objN === 0) {
+                //             newArr.push(temp);
+                //             temp = "";
+                //         }
+                //     }
+                // }
+                // if (temp !== "") {
+                //     newArr.push(temp);
+                // }
                 console.log("newArr for Obj = ");
                 console.log(newArr);
                 const newObj = {};
@@ -155,12 +190,17 @@ var jsonParse = function (str) {
         //it's a number or null
         //console.log(strPart);
         console.log("primitive");
-        console.log(strPart[0]);
-        console.log(strPart[strPart.length - 3]);
+
+        console.log("strPart as primitive");
+        console.log(strPart);
+
         if (strPart === "null") {
             return null;
         }
-        return Number(strPart);
+        if (strPart !== "") {
+            return Number(strPart);
+        }
+        //return strPart;
     };
 
     return recursion(str);
