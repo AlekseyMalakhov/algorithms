@@ -97,7 +97,7 @@ var jsonParse = function (str) {
                         //array finishes
                         arrN--;
                         //if all nested arrays are closed - push it in the newArr
-                        if (arrN === 0) {
+                        if (arrN === 0 && objN === 0) {
                             newArr.push(temp);
                             temp = "";
                         }
@@ -106,13 +106,15 @@ var jsonParse = function (str) {
                         //object finishes
                         objN--;
                         //if all nested objects are closed - push it in the newArr
-                        if (objN === 0) {
+                        if (arrN === 0 && objN === 0) {
                             newArr.push(temp);
                             temp = "";
                         }
                     }
                 }
-                newArr.push(temp);
+                if (temp !== "") {
+                    newArr.push(temp);
+                }
                 console.log("newArr for Obj = ");
                 console.log(newArr);
                 const newObj = {};
