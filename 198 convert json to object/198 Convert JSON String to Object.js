@@ -76,13 +76,52 @@ var jsonParse = function (str) {
             console.log(newStr);
             //console.log(newStr.length);
             if (newStr.length > 0) {
-                //if there are letters inside - split it to items and push them into the object
-                const newArr = newStr.split(",");
+                //const newArr = newStr.split(",");
+                const newArr = [];
+                let arrN = 0;
+                let objN = 0;
+                let temp = "";
+                for (let i = 0; i < newStr.length; i++) {
+                    const letter = newStr[i];
+                    temp = temp + letter;
+                    if (letter === "[") {
+                        //array begins
+                        arrN++;
+                    }
+                    if (letter === "{") {
+                        //array begins
+                        objN++;
+                    }
+
+                    if (letter === "]") {
+                        //array finishes
+                        arrN--;
+                        //if all nested arrays are closed - push it in the newArr
+                        if (arrN === 0) {
+                            newArr.push(temp);
+                            temp = "";
+                        }
+                    }
+                    if (letter === "}") {
+                        //object finishes
+                        objN--;
+                        //if all nested objects are closed - push it in the newArr
+                        if (objN === 0) {
+                            newArr.push(temp);
+                            temp = "";
+                        }
+                    }
+                }
+                newArr.push(temp);
                 console.log("newArr for Obj = ");
                 console.log(newArr);
                 const newObj = {};
                 for (let i = 0; i < newArr.length; i++) {
-                    const parts = newArr[i].trim();
+                    let parts = newArr[i].trim();
+                    if (parts[0] === ",") {
+                        //remove unnecessary comma
+                        parts = parts.slice(1);
+                    }
                     console.log("parts");
                     console.log(parts);
                     const separator = parts.indexOf(":");
