@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 /*
 Given a string str, return parsed JSON parsedStr. You may assume the str is a valid JSON string hence it only includes strings, numbers, arrays, objects,
  booleans, and null. str will not include invisible characters and escape characters. 
@@ -39,24 +41,63 @@ const getType = (val) => {
 };
 
 var jsonParse = function (str) {
-    const recursion = (strPart) => {
+    const recursion = (dataStr) => {
+        const strPart = dataStr.trim();
         if (strPart[0] === "[" && strPart[strPart.length - 1] === "]") {
+            console.log("array = ");
+            console.log(strPart);
             //it's an array
             //remove first and last items in array
             const newStr = strPart.substring(1, strPart.length - 1);
+            console.log("newStr");
+            console.log(newStr);
+            console.log(newStr.length);
             if (newStr.length > 0) {
                 //if there are letters inside - split it to items and push them into the array
+                console.log("some check");
+                console.log(newStr.split(","));
                 const newArr = newStr.split(",").map((item) => recursion(item));
+                console.log("newArr = ");
+                console.log(newArr);
                 return newArr;
             } else {
                 return [];
             }
         }
-        return strPart;
+        if (strPart[0] === '"' && strPart[strPart.length - 1] === '"') {
+            console.log("string");
+            const newStr = strPart.substring(1, strPart.length - 1);
+            //it's a string
+            return newStr;
+        }
+        if (strPart[0] === "'" && strPart[strPart.length - 1] === "'") {
+            console.log("string after split");
+            const newStr = strPart.substring(1, strPart.length - 1);
+            //it's a string
+            return newStr;
+        }
+        //it's a number or null
+        //console.log(strPart);
+        console.log("primitive");
+        console.log(strPart[0]);
+        console.log(strPart[strPart.length - 3]);
+        if (strPart === "null") {
+            return null;
+        }
+        return Number(strPart);
     };
 
     return recursion(str);
 };
 
-console.log(jsonParse("[5]"));
-console.log(JSON.parse("[5]"));
+//check
+let data = null;
+try {
+    data = fs.readFileSync("./check.json", "utf8");
+    //console.log(data);
+} catch (err) {
+    console.error(err);
+}
+
+console.log(jsonParse(data));
+console.log(JSON.parse(data));
