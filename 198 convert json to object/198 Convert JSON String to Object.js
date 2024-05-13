@@ -43,6 +43,8 @@ const getType = (val) => {
 var jsonParse = function (str) {
     const recursion = (dataStr) => {
         const strPart = dataStr.trim();
+        console.log("dataStr after trim");
+        console.log(strPart);
         if (strPart[0] === "[" && strPart[strPart.length - 1] === "]") {
             console.log("array = ");
             console.log(strPart);
@@ -62,6 +64,39 @@ var jsonParse = function (str) {
                 return newArr;
             } else {
                 return [];
+            }
+        }
+        if (strPart[0] === "{" && strPart[strPart.length - 1] === "}") {
+            console.log("object = ");
+            console.log(strPart);
+            //it's an object
+            //remove first and last items in array
+            const newStr = strPart.substring(1, strPart.length - 1).trim();
+            console.log("newStr");
+            console.log(newStr);
+            //console.log(newStr.length);
+            if (newStr.length > 0) {
+                //if there are letters inside - split it to items and push them into the object
+                const newArr = newStr.split(",");
+                console.log("newArr for Obj = ");
+                console.log(newArr);
+                const newObj = {};
+                for (let i = 0; i < newArr.length; i++) {
+                    const parts = newArr[i].trim();
+                    console.log("parts");
+                    console.log(parts);
+                    const separator = parts.indexOf(":");
+                    const keyStr = parts.slice(0, separator).trim();
+                    const value = parts.slice(separator + 1, parts.length).trim();
+
+                    const key = keyStr.substring(1, keyStr.length - 1);
+                    console.log("key = " + key);
+                    console.log("value = " + value);
+                    newObj[key] = recursion(value);
+                }
+                return newObj;
+            } else {
+                return {};
             }
         }
         if (strPart[0] === '"' && strPart[strPart.length - 1] === '"') {
