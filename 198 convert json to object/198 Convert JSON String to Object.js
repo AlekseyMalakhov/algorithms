@@ -184,8 +184,6 @@ var jsonParse = function (str) {
     let tempValue = noValue;
     let type = null;
 
-    //placeholder for no value. As null and false can be used as values
-
 
     const getNullOrNumberOrString = (val) => {
         if (val[0] !== '"' && val[val.length - 1] !== '"') {
@@ -375,6 +373,24 @@ var jsonParse = function (str) {
                 i = i + taskLength - 1;
             } else if (letter === "{") {
                 //new object found - parse it and return as result
+                //we found a new object - parse it and return as result
+                console.log("ololo we found a new object at position = " + i);
+
+                const remainder = strPart.slice(i);
+                console.log(remainder);
+                console.log("remainder length = " + remainder.length);
+                const taskLength = getLengthOfObjectTask(remainder);
+                const task = strPart.slice(i, i + taskLength);
+                console.log("taskLength = " + taskLength);
+
+                const res = jsonParse(task);
+                console.log(task);
+                console.log(res);
+                result.push(res);
+                tempPropertyName = "";
+                tempValue = noValue;
+                console.log("next position for i = " + (i + taskLength - 1));
+                i = i + taskLength - 1;
             } else if (letter === ",") {
                 //array value has been parsed - add it
                 //trim and remove end string punctuations
