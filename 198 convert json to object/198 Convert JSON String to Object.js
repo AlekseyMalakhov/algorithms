@@ -208,11 +208,11 @@ var jsonParse = function (str) {
             const letter = task[i];
             //console.log("letter = " + letter)
             if (letter === "{") {
-                //found new object
+                //found a new object
                 objCount++;
             }
             if (letter === "}") {
-                //found end of object some object
+                //found the end of some object
 
                 objCount--;
                 if (objCount === 0) {
@@ -226,11 +226,35 @@ var jsonParse = function (str) {
         return task.length;
     };
 
+    const getLengthOfArrayTask = (task) => {
+        let arrCount = 0;
+        for (let i = 0; i < task.length; i++) {
+            const letter = task[i];
+            //console.log("letter = " + letter)
+            if (letter === "[") {
+                //found a new array
+                arrCount++;
+            }
+            if (letter === "]") {
+                //found the end of some array
+
+                arrCount--;
+                if (arrCount === 0) {
+                    //if it's 0 - it's the end of our array
+                    //return length (position of } + 1)
+                    return i + 1;
+                }
+                //else it was nested continue to search ours
+            }
+        }
+        return task.length;
+    };
+
     for (let i = 0; i < strPart.length; i++) {
         const letter = strPart[i];
         console.log("---------------------------");
-        console.log("letter = " + letter);
-        console.log("type = " + type);
+        //console.log("letter = " + letter);
+        //console.log("type = " + type);
         if (letter === "{" && type === null) {
             //object begins
             result = {};
@@ -261,17 +285,17 @@ var jsonParse = function (str) {
             //add whatever value we have now
             //trim and remove end string punctuations
             tempValue = tempValue.trim();
-            console.log(tempValue);
+            //console.log(tempValue);
             if (tempPropertyName) {
                 result[tempPropertyName] = getNullOrNumberOrString(tempValue);
             }
-            console.log(result);
+            //console.log(result);
             return result;
         } else if (type === "object property value") {
             //if we are parsing object property name
             if (letter === "{") {
                 //we found a new object - parse it and return as result
-                console.log("ololo we found new object at position = " + i);
+                console.log("ololo we found a new object at position = " + i);
 
                 const remainder = strPart.slice(i);
                 console.log(remainder);
@@ -290,6 +314,22 @@ var jsonParse = function (str) {
                 i = i + taskLength - 1;
             } else if (letter === "[") {
                 //we found a new array - parse it and return as result
+                console.log("olele we found a new array at position = " + i);
+                const remainder = strPart.slice(i);
+                console.log(remainder);
+                console.log("remainder length = " + remainder.length);
+                const taskLength = getLengthOfArrayTask(remainder);
+                const task = strPart.slice(i, i + taskLength);
+                console.log("taskLength = " + taskLength);
+
+                const res = jsonParse(task);
+                console.log(task);
+                console.log(res);
+                result[tempPropertyName] = res;
+                tempPropertyName = "";
+                tempValue = "";
+                console.log("next position for i = " + (i + taskLength - 1));
+                i = i + taskLength - 1;
             } else {
                 //it's just primitive - continue add it
                 tempValue = tempValue + letter;
