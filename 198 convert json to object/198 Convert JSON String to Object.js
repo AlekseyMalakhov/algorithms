@@ -184,6 +184,20 @@ var jsonParse = function (str) {
     let tempValue = noValue;
     let type = null;
 
+    console.log(str)
+    
+    if (str === null) {
+        return null
+    }
+
+    if (str === true) {
+        return true
+    }
+
+    if (str === false) {
+        return false
+    }
+
 
     const getNullOrNumberOrString = (val) => {
         if (val[0] !== '"' && val[val.length - 1] !== '"') {
