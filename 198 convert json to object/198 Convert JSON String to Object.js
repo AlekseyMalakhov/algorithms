@@ -180,24 +180,11 @@ var jsonParse = function (str) {
     let result = null;
     let tempPropertyName = "";
     //placeholder for no value. As null and false can be used as values
-    const noValue = Symbol()
+    const noValue = Symbol();
     let tempValue = noValue;
     let type = null;
 
-    console.log(str)
-    
-    if (str === null) {
-        return null
-    }
-
-    if (str === true) {
-        return true
-    }
-
-    if (str === false) {
-        return false
-    }
-
+    //console.log(str);
 
     const getNullOrNumberOrString = (val) => {
         if (val[0] !== '"' && val[val.length - 1] !== '"') {
@@ -212,7 +199,6 @@ var jsonParse = function (str) {
                 return true;
             }
             return Number(val);
-            
         }
         //if it's an object
         if (val[0] === "{" && val[val.length - 1] === "}") {
@@ -224,6 +210,22 @@ var jsonParse = function (str) {
         }
         return val.replaceAll('"', "");
     };
+
+    if (getNullOrNumberOrString(strPart) === null) {
+        return null;
+    }
+
+    if (getNullOrNumberOrString(strPart) === true) {
+        return true;
+    }
+
+    if (getNullOrNumberOrString(strPart) === false) {
+        return false;
+    }
+    const n = getNullOrNumberOrString(strPart);
+    if (typeof n === "number" && !isNaN(n)) {
+        return n;
+    }
 
     const getLengthOfObjectTask = (task) => {
         let objCount = 0;
@@ -311,7 +313,6 @@ var jsonParse = function (str) {
                 tempValue = tempValue.trim();
                 //console.log(tempValue);
                 result[tempPropertyName] = getNullOrNumberOrString(tempValue);
-                
             }
             //console.log(result);
             return result;
@@ -357,7 +358,7 @@ var jsonParse = function (str) {
             } else {
                 //it's just primitive - continue add it
                 if (tempValue === noValue) {
-                    tempValue = ""
+                    tempValue = "";
                 }
                 tempValue = tempValue + letter;
             }
@@ -427,12 +428,11 @@ var jsonParse = function (str) {
             } else {
                 //it's just primitive - continue add it
                 if (tempValue === noValue) {
-                    tempValue = ""
+                    tempValue = "";
                 }
                 tempValue = tempValue + letter;
             }
         }
-
     }
     console.log("here2");
     return result;
