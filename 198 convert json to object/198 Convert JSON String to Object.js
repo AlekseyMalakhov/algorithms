@@ -113,43 +113,7 @@ var jsonParse = function (str) {
             if (newStr.length > 0) {
                 //const newArr = newStr.split(",");
                 const newArr = getNewArr(newStr);
-                // let arrN = 0;
-                // let objN = 0;
-                // let temp = "";
-                // for (let i = 0; i < newStr.length; i++) {
-                //     const letter = newStr[i];
-                //     temp = temp + letter;
-                //     if (letter === "[") {
-                //         //array begins
-                //         arrN++;
-                //     }
-                //     if (letter === "{") {
-                //         //array begins
-                //         objN++;
-                //     }
 
-                //     if (letter === "]") {
-                //         //array finishes
-                //         arrN--;
-                //         //if all nested arrays are closed - push it in the newArr
-                //         if (arrN === 0 && objN === 0) {
-                //             newArr.push(temp);
-                //             temp = "";
-                //         }
-                //     }
-                //     if (letter === "}") {
-                //         //object finishes
-                //         objN--;
-                //         //if all nested objects are closed - push it in the newArr
-                //         if (arrN === 0 && objN === 0) {
-                //             newArr.push(temp);
-                //             temp = "";
-                //         }
-                //     }
-                // }
-                // if (temp !== "") {
-                //     newArr.push(temp);
-                // }
                 console.log("newArr for Obj = ");
                 console.log(newArr);
                 const newObj = {};
@@ -198,13 +162,20 @@ var jsonParse = function (str) {
             return null;
         }
         if (strPart !== "") {
-            return Number(strPart);
+            //return Number(strPart);
+            return strPart;
         }
         //return strPart;
     };
 
     return recursion(str);
 };
+
+/*
+var jsonParse = function (str) {
+    let strPart = str.trim();
+};
+*/
 
 //check
 let data = null;

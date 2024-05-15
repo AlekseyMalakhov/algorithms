@@ -1,6 +1,7 @@
-[
-    ["ololo", "keke"],
-    {
-        "zaza": 25
+{
+    "dodo": [1, 2, 3],
+    "sksk": "rew",
+    "lele": {
+        "hi": "all"
     }
-]
+}
