@@ -339,29 +339,32 @@ var jsonParse = function (str) {
             result = [];
             //let's parse array values
             type = "array value";
-        } else if (letter === "[" && type === "array value") {
-            //new array found - parse it and return as result
-        } else if (letter === "{" && type === "array value") {
-            //new object found - parse it and return as result
-        } else if (letter === "," && type === "array value") {
-            //array value has been parsed - add it
-            //trim and remove end string punctuations
-            tempValue = tempValue.trim();
-            tempValue = getNullOrNumberOrString(tempValue);
-            result.push(tempValue);
-            tempValue = "";
-        } else if (letter === "]" && type === "array value") {
-            //array parsing is finished
-            //add whatever value we have now
-            //trim and remove end string punctuations
-            tempValue = tempValue.trim();
-            tempValue = getNullOrNumberOrString(tempValue);
-            result.push(tempValue);
-            return result;
         } else if (type === "array value") {
-            //it's just primitive - continue add it
-            tempValue = tempValue + letter;
+            if (letter === "[") {
+                //new array found - parse it and return as result
+            } else if (letter === "{") {
+                //new object found - parse it and return as result
+            } else if (letter === ",") {
+                //array value has been parsed - add it
+                //trim and remove end string punctuations
+                tempValue = tempValue.trim();
+                tempValue = getNullOrNumberOrString(tempValue);
+                result.push(tempValue);
+                tempValue = "";
+            } else if (letter === "]") {
+                //array parsing is finished
+                //add whatever value we have now
+                //trim and remove end string punctuations
+                tempValue = tempValue.trim();
+                tempValue = getNullOrNumberOrString(tempValue);
+                result.push(tempValue);
+                return result;
+            } else {
+                //it's just primitive - continue add it
+                tempValue = tempValue + letter;
+            }
         }
+
     }
     console.log("here2");
     return result;
