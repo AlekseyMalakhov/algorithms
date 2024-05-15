@@ -225,7 +225,6 @@ var jsonParse = function (str) {
             //object parsing is finished
             //add whatever value we have now
             //trim and remove end string punctuations
-            //tempValue = tempValue.trim().replaceAll('"', "");
             tempValue = tempValue.trim();
             //console.log(tempValue);
             result[tempPropertyName] = getNullOrNumberOrString(tempValue);
@@ -252,14 +251,16 @@ var jsonParse = function (str) {
         } else if (letter === "," && type === "array value") {
             //array value has been parsed - add it
             //trim and remove end string punctuations
-            tempValue = tempValue.trim().replaceAll('"', "");
+            tempValue = tempValue.trim();
+            tempValue = getNullOrNumberOrString(tempValue);
             result.push(tempValue);
             tempValue = "";
         } else if (letter === "]" && type === "array value") {
             //array parsing is finished
             //add whatever value we have now
             //trim and remove end string punctuations
-            tempValue = tempValue.trim().replaceAll('"', "");
+            tempValue = tempValue.trim();
+            tempValue = getNullOrNumberOrString(tempValue);
             result.push(tempValue);
             return result;
         } else if (type === "array value") {
