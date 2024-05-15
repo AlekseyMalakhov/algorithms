@@ -275,11 +275,22 @@ var jsonParse = function (str) {
         return task.length;
     };
 
+    const getLengthOfStringTask = (task) => {
+        for (let i = 0; i < task.length; i++) {
+            const letter = task[i];
+            if (letter === '"' && i !== 0) {
+                //this is the end of our string - return the length of it (not position)
+                return i + 1;
+            }
+        }
+        return task.length;
+    };
+
     for (let i = 0; i < strPart.length; i++) {
         const letter = strPart[i];
         console.log("---------------------------");
-        //console.log("letter = " + letter);
-        //console.log("type = " + type);
+        console.log("letter = " + letter);
+        console.log("type = " + type);
         if (letter === "{" && type === null) {
             //object begins
             result = {};
@@ -351,6 +362,19 @@ var jsonParse = function (str) {
                 console.log(task);
                 console.log(res);
                 result[tempPropertyName] = res;
+                tempPropertyName = "";
+                tempValue = noValue;
+                console.log("next position for i = " + (i + taskLength - 1));
+                i = i + taskLength - 1;
+            } else if (letter === '"') {
+                //we found a new string - let's parse it
+                const remainder = strPart.slice(i);
+                console.log(remainder);
+                console.log("remainder length = " + remainder.length);
+                const taskLength = getLengthOfStringTask(remainder);
+                console.log("taskLength = " + taskLength);
+                const task = strPart.slice(i, i + taskLength);
+                result[tempPropertyName] = getNullOrNumberOrString(task);;
                 tempPropertyName = "";
                 tempValue = noValue;
                 console.log("next position for i = " + (i + taskLength - 1));
