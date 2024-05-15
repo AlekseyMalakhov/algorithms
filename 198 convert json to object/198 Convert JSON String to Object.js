@@ -192,11 +192,11 @@ var jsonParse = function (str) {
             }
         }
         //if it's an object
-        if (val[0] !== "{" && val[val.length - 1] !== "}") {
+        if (val[0] === "{" && val[val.length - 1] === "}") {
             return val;
         }
         //if it's an array
-        if (val[0] !== "[" && val[val.length - 1] !== "]") {
+        if (val[0] === "[" && val[val.length - 1] === "]") {
             return val;
         }
         return val.replaceAll('"', "");
@@ -246,9 +246,8 @@ var jsonParse = function (str) {
         } else if (letter === "," && type === "object property value") {
             //object property value has been parsed - add it
             //trim and remove end string punctuations
-            tempValue = tempValue.trim().replaceAll('"', "");
             if (tempPropertyName) {
-                result[tempPropertyName] = tempValue;
+                result[tempPropertyName] = getNullOrNumberOrString(tempValue);
             }
             tempPropertyName = "";
             tempValue = "";
@@ -262,10 +261,11 @@ var jsonParse = function (str) {
             //add whatever value we have now
             //trim and remove end string punctuations
             tempValue = tempValue.trim();
-            //console.log(tempValue);
+            console.log(tempValue);
             if (tempPropertyName) {
                 result[tempPropertyName] = getNullOrNumberOrString(tempValue);
             }
+            console.log(result);
             return result;
         } else if (type === "object property value") {
             //if we are parsing object property name
