@@ -228,9 +228,9 @@ var jsonParse = function (str) {
 
     for (let i = 0; i < strPart.length; i++) {
         const letter = strPart[i];
-        // console.log("---------------------------");
-        //console.log("letter = " + letter);
-        // console.log("type = " + type);
+        console.log("---------------------------");
+        console.log("letter = " + letter);
+        console.log("type = " + type);
         if (letter === "{" && type === null) {
             //object begins
             result = {};
@@ -247,7 +247,9 @@ var jsonParse = function (str) {
             //object property value has been parsed - add it
             //trim and remove end string punctuations
             tempValue = tempValue.trim().replaceAll('"', "");
-            result[tempPropertyName] = tempValue;
+            if (tempPropertyName) {
+                result[tempPropertyName] = tempValue;
+            }
             tempPropertyName = "";
             tempValue = "";
             //let's parse object's next property name
