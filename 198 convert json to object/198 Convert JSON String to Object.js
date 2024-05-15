@@ -27,6 +27,7 @@ Constraints:
     1 <= str.length <= 105
 */
 
+/*
 const getNewArr = (str) => {
     const arr = [];
     let arrN = 0;
@@ -68,6 +69,7 @@ const getNewArr = (str) => {
     }
     return arr;
 };
+
 
 var jsonParse = function (str) {
     const recursion = (dataStr) => {
@@ -171,11 +173,67 @@ var jsonParse = function (str) {
     return recursion(str);
 };
 
-/*
+*/
 var jsonParse = function (str) {
     let strPart = str.trim();
+    let result = null;
+    let tempPropertyName = "";
+    let tempValue = "";
+    let type = null;
+    for (let i = 0; i < strPart.length; i++) {
+        const letter = strPart[i];
+        console.log("---------------------------");
+        console.log("letter = " + letter);
+        console.log("type = " + type);
+        if (letter === "{" && type === null) {
+            //object begins
+            result = {};
+            //let's parse object property name
+            type = "object property name";
+        } else if (letter === ":" && type === "object property name") {
+            //object property name has been parsed - add it
+            //trim and remove end string punctuations
+            tempPropertyName = tempPropertyName.trim().replaceAll('"', "");
+            result[tempPropertyName] = null;
+            //let's parse object property value
+            type = "object property value";
+        } else if (letter === "," && type === "object property value") {
+            //object property value has been parsed - add it
+            //trim and remove end string punctuations
+            tempValue = tempValue.trim().replaceAll('"', "");
+            result[tempPropertyName] = tempValue;
+            tempPropertyName = "";
+            tempValue = "";
+            //let's parse object's next property name
+            type = "object property name";
+        } else if (type === "object property name") {
+            //if we are parsing object property name
+            tempPropertyName = tempPropertyName + letter;
+        } else if (letter === "}" && type === "object property value") {
+            //object parsing is finished
+            //add whatever value we have now
+            console.log("here1");
+            //trim and remove end string punctuations
+            tempValue = tempValue.trim().replaceAll('"', "");
+            result[tempPropertyName] = tempValue;
+            return result;
+        } else if (type === "object property value") {
+            //if we are parsing object property name
+            if (letter === "{") {
+                //we found a new object - parse it and return as result
+            } else if (letter === "[") {
+                //we found a new array - parse it and return as result
+            } else {
+                //it's just primitive - continue add it
+                console.log("here");
+                console.log(tempValue);
+                tempValue = tempValue + letter;
+            }
+        }
+    }
+    console.log("here2");
+    return result;
 };
-*/
 
 //check
 let data = null;
