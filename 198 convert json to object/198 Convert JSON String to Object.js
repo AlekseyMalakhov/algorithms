@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { allowedNodeEnvironmentFlags } from "node:process";
 
 /*
 Given a string str, return parsed JSON parsedStr. You may assume the str is a valid JSON string hence it only includes strings, numbers, arrays, objects,
@@ -190,12 +191,45 @@ var jsonParse = function (str) {
                 return Number(val);
             }
         }
+        //if it's an object
+        if (val[0] !== "{" && val[val.length - 1] !== "}") {
+            return val;
+        }
+        //if it's an array
+        if (val[0] !== "[" && val[val.length - 1] !== "]") {
+            return val;
+        }
         return val.replaceAll('"', "");
     };
+
+    const getLengthOfObjectTask = (task) => {
+        let objCount = 0;
+        for (let i = 0; i < task.length; i++) {
+            const letter = task[i];
+            //console.log("letter = " + letter)
+            if (letter === "{") {
+                //found new object
+                objCount++;
+            }
+            if (letter === "}") {
+                //found end of object some object
+
+                objCount--;
+                if (objCount === 0) {
+                    //if it's 0 - it's the end of our object
+                    //return length (position of } + 1)
+                    return i + 1;
+                }
+                //else it was nested continue to search ours
+            }
+        }
+        return task.length;
+    };
+
     for (let i = 0; i < strPart.length; i++) {
         const letter = strPart[i];
         // console.log("---------------------------");
-        // console.log("letter = " + letter);
+        //console.log("letter = " + letter);
         // console.log("type = " + type);
         if (letter === "{" && type === null) {
             //object begins
@@ -227,12 +261,31 @@ var jsonParse = function (str) {
             //trim and remove end string punctuations
             tempValue = tempValue.trim();
             //console.log(tempValue);
-            result[tempPropertyName] = getNullOrNumberOrString(tempValue);
+            if (tempPropertyName) {
+                result[tempPropertyName] = getNullOrNumberOrString(tempValue);
+            }
             return result;
         } else if (type === "object property value") {
             //if we are parsing object property name
             if (letter === "{") {
                 //we found a new object - parse it and return as result
+                console.log("ololo we found new object at position = " + i);
+
+                const remainder = strPart.slice(i);
+                console.log(remainder);
+                console.log("remainder length = " + remainder.length);
+                const taskLength = getLengthOfObjectTask(remainder);
+                const task = strPart.slice(i, i + taskLength);
+                console.log("taskLength = " + taskLength);
+
+                const res = jsonParse(task);
+                console.log(task);
+                console.log(res);
+                result[tempPropertyName] = res;
+                tempPropertyName = "";
+                tempValue = "";
+                console.log("next position for i = " + (i + taskLength - 1));
+                i = i + taskLength - 1;
             } else if (letter === "[") {
                 //we found a new array - parse it and return as result
             } else {
