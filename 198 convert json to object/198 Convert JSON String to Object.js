@@ -179,17 +179,28 @@ var jsonParse = function (str) {
     let strPart = str.trim();
     let result = null;
     let tempPropertyName = "";
-    let tempValue = "";
+    //placeholder for no value. As null and false can be used as values
+    const noValue = Symbol()
+    let tempValue = noValue;
     let type = null;
+
+    //placeholder for no value. As null and false can be used as values
+
 
     const getNullOrNumberOrString = (val) => {
         if (val[0] !== '"' && val[val.length - 1] !== '"') {
             //if the value is not inside parenthesis - it's either Number ot null
             if (val === "null") {
                 return null;
-            } else {
-                return Number(val);
             }
+            if (val === "false") {
+                return false;
+            }
+            if (val === "true") {
+                return true;
+            }
+            return Number(val);
+            
         }
         //if it's an object
         if (val[0] === "{" && val[val.length - 1] === "}") {
@@ -274,7 +285,7 @@ var jsonParse = function (str) {
                 result[tempPropertyName] = getNullOrNumberOrString(tempValue);
             }
             tempPropertyName = "";
-            tempValue = "";
+            tempValue = noValue;
             //let's parse object's next property name
             type = "object property name";
         } else if (type === "object property name") {
@@ -284,10 +295,11 @@ var jsonParse = function (str) {
             //object parsing is finished
             //add whatever value we have now
             //trim and remove end string punctuations
-            tempValue = tempValue.trim();
-            //console.log(tempValue);
-            if (tempPropertyName) {
+            if (tempValue !== noValue) {
+                tempValue = tempValue.trim();
+                //console.log(tempValue);
                 result[tempPropertyName] = getNullOrNumberOrString(tempValue);
+                
             }
             //console.log(result);
             return result;
@@ -309,7 +321,7 @@ var jsonParse = function (str) {
                 console.log(res);
                 result[tempPropertyName] = res;
                 tempPropertyName = "";
-                tempValue = "";
+                tempValue = noValue;
                 console.log("next position for i = " + (i + taskLength - 1));
                 i = i + taskLength - 1;
             } else if (letter === "[") {
@@ -327,11 +339,14 @@ var jsonParse = function (str) {
                 console.log(res);
                 result[tempPropertyName] = res;
                 tempPropertyName = "";
-                tempValue = "";
+                tempValue = noValue;
                 console.log("next position for i = " + (i + taskLength - 1));
                 i = i + taskLength - 1;
             } else {
                 //it's just primitive - continue add it
+                if (tempValue === noValue) {
+                    tempValue = ""
+                }
                 tempValue = tempValue + letter;
             }
         } else if (letter === "[" && type === null) {
@@ -342,25 +357,48 @@ var jsonParse = function (str) {
         } else if (type === "array value") {
             if (letter === "[") {
                 //new array found - parse it and return as result
+                console.log("olele we found a new array at position = " + i);
+                const remainder = strPart.slice(i);
+                console.log(remainder);
+                console.log("remainder length = " + remainder.length);
+                const taskLength = getLengthOfArrayTask(remainder);
+                const task = strPart.slice(i, i + taskLength);
+                console.log("taskLength = " + taskLength);
+
+                const res = jsonParse(task);
+                console.log(task);
+                console.log(res);
+                result.push(res);
+                tempPropertyName = "";
+                tempValue = noValue;
+                console.log("next position for i = " + (i + taskLength - 1));
+                i = i + taskLength - 1;
             } else if (letter === "{") {
                 //new object found - parse it and return as result
             } else if (letter === ",") {
                 //array value has been parsed - add it
                 //trim and remove end string punctuations
-                tempValue = tempValue.trim();
-                tempValue = getNullOrNumberOrString(tempValue);
-                result.push(tempValue);
-                tempValue = "";
+                if (tempValue !== noValue) {
+                    tempValue = tempValue.trim();
+                    tempValue = getNullOrNumberOrString(tempValue);
+                    result.push(tempValue);
+                    tempValue = noValue;
+                }
             } else if (letter === "]") {
                 //array parsing is finished
                 //add whatever value we have now
                 //trim and remove end string punctuations
-                tempValue = tempValue.trim();
-                tempValue = getNullOrNumberOrString(tempValue);
-                result.push(tempValue);
+                if (tempValue !== noValue) {
+                    tempValue = tempValue.trim();
+                    tempValue = getNullOrNumberOrString(tempValue);
+                    result.push(tempValue);
+                }
                 return result;
             } else {
                 //it's just primitive - continue add it
+                if (tempValue === noValue) {
+                    tempValue = ""
+                }
                 tempValue = tempValue + letter;
             }
         }
