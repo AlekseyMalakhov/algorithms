@@ -227,6 +227,11 @@ var jsonParse = function (str) {
         return n;
     }
 
+    if (strPart[0] === '"' && strPart[strPart.length - 1] === '"') {
+        //if it is a valid string - return it
+        return getNullOrNumberOrString(strPart);
+    }
+
     const getLengthOfObjectTask = (task) => {
         let objCount = 0;
         for (let i = 0; i < task.length; i++) {
@@ -286,179 +291,226 @@ var jsonParse = function (str) {
         return task.length;
     };
 
+    const getLengthOfPrimitiveTask = (task) => {
+        for (let i = 0; i < task.length; i++) {
+            const letter = task[i];
+            if (letter === "," || letter === " " || letter === "]" || letter === "}") {
+                //this is the end of our primitive - return the not position
+                return i;
+            }
+        }
+        return task.length;
+    };
+
     for (let i = 0; i < strPart.length; i++) {
         const letter = strPart[i];
-        console.log("---------------------------");
-        console.log("letter = " + letter);
-        console.log("type = " + type);
-        if (letter === "{" && type === null) {
-            //object begins
-            result = {};
-            //let's parse object property name
-            type = "object property name";
-        } else if (letter === ":" && type === "object property name") {
-            //object property name has been parsed - add it
-            //trim and remove end string punctuations
-            tempPropertyName = tempPropertyName.trim().replaceAll('"', "");
-            result[tempPropertyName] = null;
-            //let's parse object property value
-            type = "object property value";
-        } else if (letter === "," && type === "object property value") {
-            //object property value has been parsed - add it
-            //trim and remove end string punctuations
-            if (tempPropertyName) {
-                result[tempPropertyName] = getNullOrNumberOrString(tempValue);
-            }
-            tempPropertyName = "";
-            tempValue = noValue;
-            //let's parse object's next property name
-            type = "object property name";
-        } else if (type === "object property name") {
-            //if we are parsing object property name
-            tempPropertyName = tempPropertyName + letter;
-        } else if (letter === "}" && type === "object property value") {
-            //object parsing is finished
-            //add whatever value we have now
-            //trim and remove end string punctuations
-            if (tempValue !== noValue) {
-                tempValue = tempValue.trim();
-                //console.log(tempValue);
-                result[tempPropertyName] = getNullOrNumberOrString(tempValue);
-            }
-            //console.log(result);
-            return result;
-        } else if (type === "object property value") {
-            //if we are parsing object property name
-            if (letter === "{") {
-                //we found a new object - parse it and return as result
-                console.log("ololo we found a new object at position = " + i);
-
-                const remainder = strPart.slice(i);
-                console.log(remainder);
-                console.log("remainder length = " + remainder.length);
-                const taskLength = getLengthOfObjectTask(remainder);
-                const task = strPart.slice(i, i + taskLength);
-                console.log("taskLength = " + taskLength);
-
-                const res = jsonParse(task);
-                console.log(task);
-                console.log(res);
-                result[tempPropertyName] = res;
-                tempPropertyName = "";
-                tempValue = noValue;
-                console.log("next position for i = " + (i + taskLength - 1));
-                i = i + taskLength - 1;
-            } else if (letter === "[") {
-                //we found a new array - parse it and return as result
-                console.log("olele we found a new array at position = " + i);
-                const remainder = strPart.slice(i);
-                console.log(remainder);
-                console.log("remainder length = " + remainder.length);
-                const taskLength = getLengthOfArrayTask(remainder);
-                const task = strPart.slice(i, i + taskLength);
-                console.log("taskLength = " + taskLength);
-
-                const res = jsonParse(task);
-                console.log(task);
-                console.log(res);
-                result[tempPropertyName] = res;
-                tempPropertyName = "";
-                tempValue = noValue;
-                console.log("next position for i = " + (i + taskLength - 1));
-                i = i + taskLength - 1;
-            } else if (letter === '"') {
-                //we found a new string - let's parse it
-                const remainder = strPart.slice(i);
-                console.log(remainder);
-                console.log("remainder length = " + remainder.length);
-                const taskLength = getLengthOfStringTask(remainder);
-                console.log("taskLength = " + taskLength);
-                const task = strPart.slice(i, i + taskLength);
-                result[tempPropertyName] = getNullOrNumberOrString(task);;
-                tempPropertyName = "";
-                tempValue = noValue;
-                console.log("next position for i = " + (i + taskLength - 1));
-                i = i + taskLength - 1;
-            } else {
-                //it's just primitive - continue add it
-                if (tempValue === noValue) {
-                    tempValue = "";
-                }
-                tempValue = tempValue + letter;
-            }
-        } else if (letter === "[" && type === null) {
-            //array begins
-            result = [];
-            //let's parse array values
-            type = "array value";
-        } else if (type === "array value") {
-            if (letter === "[") {
-                //new array found - parse it and return as result
-                console.log("olele we found a new array at position = " + i);
-                const remainder = strPart.slice(i);
-                console.log(remainder);
-                console.log("remainder length = " + remainder.length);
-                const taskLength = getLengthOfArrayTask(remainder);
-                const task = strPart.slice(i, i + taskLength);
-                console.log("taskLength = " + taskLength);
-
-                const res = jsonParse(task);
-                console.log(task);
-                console.log(res);
-                result.push(res);
-                tempPropertyName = "";
-                tempValue = noValue;
-                console.log("next position for i = " + (i + taskLength - 1));
-                i = i + taskLength - 1;
-            } else if (letter === "{") {
-                //new object found - parse it and return as result
-                //we found a new object - parse it and return as result
-                console.log("ololo we found a new object at position = " + i);
-
-                const remainder = strPart.slice(i);
-                console.log(remainder);
-                console.log("remainder length = " + remainder.length);
-                const taskLength = getLengthOfObjectTask(remainder);
-                const task = strPart.slice(i, i + taskLength);
-                console.log("taskLength = " + taskLength);
-
-                const res = jsonParse(task);
-                console.log(task);
-                console.log(res);
-                result.push(res);
-                tempPropertyName = "";
-                tempValue = noValue;
-                console.log("next position for i = " + (i + taskLength - 1));
-                i = i + taskLength - 1;
-            } else if (letter === ",") {
-                //array value has been parsed - add it
+        if (letter !== " ") {
+            //console.log("---------------------------");
+            // console.log("letter = " + letter);
+            // console.log("type = " + type);
+            if (letter === "{" && type === null) {
+                //object begins
+                result = {};
+                //let's parse object property name
+                type = "object property name";
+            } else if (letter === ":" && type === "object property name") {
+                //object property name has been parsed - add it
                 //trim and remove end string punctuations
-                if (tempValue !== noValue) {
-                    tempValue = tempValue.trim();
-                    tempValue = getNullOrNumberOrString(tempValue);
-                    result.push(tempValue);
-                    tempValue = noValue;
+                tempPropertyName = tempPropertyName.trim().replaceAll('"', "");
+                result[tempPropertyName] = null;
+                //let's parse object property value
+                type = "object property value";
+            } else if (letter === "," && type === "object property value") {
+                //object property value has been parsed - add it
+                //trim and remove end string punctuations
+                if (tempPropertyName) {
+                    result[tempPropertyName] = getNullOrNumberOrString(tempValue);
                 }
-            } else if (letter === "]") {
-                //array parsing is finished
+                tempPropertyName = "";
+                tempValue = noValue;
+                //let's parse object's next property name
+                type = "object property name";
+            } else if (type === "object property name") {
+                //if we are parsing object property name
+                tempPropertyName = tempPropertyName + letter;
+            } else if (letter === "}" && type === "object property value") {
+                //object parsing is finished
                 //add whatever value we have now
                 //trim and remove end string punctuations
                 if (tempValue !== noValue) {
                     tempValue = tempValue.trim();
-                    tempValue = getNullOrNumberOrString(tempValue);
-                    result.push(tempValue);
+                    //console.log(tempValue);
+                    result[tempPropertyName] = getNullOrNumberOrString(tempValue);
                 }
+                //console.log(result);
                 return result;
-            } else {
-                //it's just primitive - continue add it
-                if (tempValue === noValue) {
-                    tempValue = "";
+            } else if (type === "object property value") {
+                //if we are parsing object property name
+                if (letter === "{") {
+                    //we found a new object - parse it and return as result
+                    //console.log("ololo we found a new object at position = " + i);
+
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfObjectTask(remainder);
+                    const task = strPart.slice(i, i + taskLength);
+                    //console.log("taskLength = " + taskLength);
+
+                    const res = jsonParse(task);
+                    // console.log(task);
+                    // console.log(res);
+                    result[tempPropertyName] = res;
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    //console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                } else if (letter === "[") {
+                    //we found a new array - parse it and return as result
+                    //console.log("olele we found a new array at position = " + i);
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfArrayTask(remainder);
+                    const task = strPart.slice(i, i + taskLength);
+                    //console.log("taskLength = " + taskLength);
+
+                    const res = jsonParse(task);
+                    // console.log(task);
+                    // console.log(res);
+                    result[tempPropertyName] = res;
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                } else if (letter === '"') {
+                    //we found a new string - let's parse it
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfStringTask(remainder);
+                    //console.log("taskLength = " + taskLength);
+                    const task = strPart.slice(i, i + taskLength);
+                    result[tempPropertyName] = getNullOrNumberOrString(task);
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                } else {
+                    //it's just primitive - find the end of it
+                    //console.log("lele");
+                    if (tempValue === noValue) {
+                        tempValue = "";
+                    }
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfPrimitiveTask(remainder);
+                    //console.log("taskLength = " + taskLength);
+                    const task = strPart.slice(i, i + taskLength);
+                    result[tempPropertyName] = getNullOrNumberOrString(task);
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    //console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
                 }
-                tempValue = tempValue + letter;
+            } else if (letter === "[" && type === null) {
+                //array begins
+                result = [];
+                //let's parse array values
+                type = "array value";
+            } else if (type === "array value") {
+                if (letter === "[") {
+                    //new array found - parse it and return as result
+                    //console.log("olele we found a new array at position = " + i);
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfArrayTask(remainder);
+                    const task = strPart.slice(i, i + taskLength);
+                    //console.log("taskLength = " + taskLength);
+
+                    const res = jsonParse(task);
+                    // console.log(task);
+                    // console.log(res);
+                    result.push(res);
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    //console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                } else if (letter === "{") {
+                    //new object found - parse it and return as result
+                    //we found a new object - parse it and return as result
+                    //console.log("ololo we found a new object at position = " + i);
+
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfObjectTask(remainder);
+                    const task = strPart.slice(i, i + taskLength);
+                    //console.log("taskLength = " + taskLength);
+
+                    const res = jsonParse(task);
+                    // console.log(task);
+                    // console.log(res);
+                    result.push(res);
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    //console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                } else if (letter === ",") {
+                    //array value has been parsed - add it
+                    //trim and remove end string punctuations
+                    if (tempValue !== noValue) {
+                        tempValue = tempValue.trim();
+                        tempValue = getNullOrNumberOrString(tempValue);
+                        result.push(tempValue);
+                        tempValue = noValue;
+                    }
+                } else if (letter === "]") {
+                    //array parsing is finished
+                    //add whatever value we have now
+                    //trim and remove end string punctuations
+                    if (tempValue !== noValue) {
+                        tempValue = tempValue.trim();
+                        tempValue = getNullOrNumberOrString(tempValue);
+                        result.push(tempValue);
+                    }
+                    return result;
+                } else if (letter === '"') {
+                    //we found a new string - let's parse it
+                    const remainder = strPart.slice(i);
+                    // console.log(remainder);
+                    // console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfStringTask(remainder);
+                    //console.log("taskLength = " + taskLength);
+                    const task = strPart.slice(i, i + taskLength);
+                    result.push(getNullOrNumberOrString(task));
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    //console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                } else {
+                    //it's just primitive - continue add it
+                    if (tempValue === noValue) {
+                        tempValue = "";
+                    }
+                    const remainder = strPart.slice(i);
+                    //console.log(remainder);
+                    //console.log("remainder length = " + remainder.length);
+                    const taskLength = getLengthOfPrimitiveTask(remainder);
+                    //console.log("taskLength = " + taskLength);
+                    const task = strPart.slice(i, i + taskLength);
+                    result.push(getNullOrNumberOrString(task));
+                    tempPropertyName = "";
+                    tempValue = noValue;
+                    //console.log("next position for i = " + (i + taskLength - 1));
+                    i = i + taskLength - 1;
+                }
             }
         }
     }
-    console.log("here2");
+    //console.log("here2");
     return result;
 };
 
