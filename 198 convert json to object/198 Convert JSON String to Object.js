@@ -180,11 +180,23 @@ var jsonParse = function (str) {
     let tempPropertyName = "";
     let tempValue = "";
     let type = null;
+
+    const getNullOrNumberOrString = (val) => {
+        if (val[0] !== '"' && val[val.length - 1] !== '"') {
+            //if the value is not inside parenthesis - it's either Number ot null
+            if (val === "null") {
+                return null;
+            } else {
+                return Number(val);
+            }
+        }
+        return val.replaceAll('"', "");
+    };
     for (let i = 0; i < strPart.length; i++) {
         const letter = strPart[i];
-        console.log("---------------------------");
-        console.log("letter = " + letter);
-        console.log("type = " + type);
+        // console.log("---------------------------");
+        // console.log("letter = " + letter);
+        // console.log("type = " + type);
         if (letter === "{" && type === null) {
             //object begins
             result = {};
@@ -212,10 +224,11 @@ var jsonParse = function (str) {
         } else if (letter === "}" && type === "object property value") {
             //object parsing is finished
             //add whatever value we have now
-            console.log("here1");
             //trim and remove end string punctuations
-            tempValue = tempValue.trim().replaceAll('"', "");
-            result[tempPropertyName] = tempValue;
+            //tempValue = tempValue.trim().replaceAll('"', "");
+            tempValue = tempValue.trim();
+            //console.log(tempValue);
+            result[tempPropertyName] = getNullOrNumberOrString(tempValue);
             return result;
         } else if (type === "object property value") {
             //if we are parsing object property name
@@ -225,10 +238,33 @@ var jsonParse = function (str) {
                 //we found a new array - parse it and return as result
             } else {
                 //it's just primitive - continue add it
-                console.log("here");
-                console.log(tempValue);
                 tempValue = tempValue + letter;
             }
+        } else if (letter === "[" && type === null) {
+            //array begins
+            result = [];
+            //let's parse array values
+            type = "array value";
+        } else if (letter === "[" && type === "array value") {
+            //new array found - parse it and return as result
+        } else if (letter === "{" && type === "array value") {
+            //new object found - parse it and return as result
+        } else if (letter === "," && type === "array value") {
+            //array value has been parsed - add it
+            //trim and remove end string punctuations
+            tempValue = tempValue.trim().replaceAll('"', "");
+            result.push(tempValue);
+            tempValue = "";
+        } else if (letter === "]" && type === "array value") {
+            //array parsing is finished
+            //add whatever value we have now
+            //trim and remove end string punctuations
+            tempValue = tempValue.trim().replaceAll('"', "");
+            result.push(tempValue);
+            return result;
+        } else if (type === "array value") {
+            //it's just primitive - continue add it
+            tempValue = tempValue + letter;
         }
     }
     console.log("here2");
