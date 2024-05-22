@@ -31,9 +31,6 @@ var sortedSquares = function (nums) {
         while (left >= 0 || right < nums.length) {
             const l = nums[left];
             const r = nums[right];
-            // console.log(l);
-            // console.log(r);
-            // console.log("------------------");
 
             if (Math.abs(l) > Math.abs(r) || l === undefined) {
                 arr.push(r ** 2);
@@ -52,14 +49,14 @@ var sortedSquares = function (nums) {
         }
     }
 
-    //if both are negative
+    //if both are negative - use it in reverse order
     else if (nums[0] < 0 && nums[nums.length - 1] <= 0) {
         for (let i = 0; i < nums.length; i++) {
             arr[nums.length - 1 - i] = nums[i] ** 2;
         }
     }
 
-    //if both are positive
+    //if both are positive - use it in normal order
     else if (nums[0] >= 0 && nums[nums.length - 1] > 0) {
         for (let i = 0; i < nums.length; i++) {
             arr[i] = nums[i] ** 2;
