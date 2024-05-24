@@ -202,17 +202,25 @@ var numSubarrayProductLessThanK = function (nums, k) {
     //console.log(prodArr);
 
     let res = 0;
+    let found = null;
     for (let i = 0; i < nums.length; i++) {
         let p1 = nums.length - 1; //starts from the right
-        let p2 = i; //starts from the left
+        let p2 = found; //starts from the left. If we have previously found left - start to search from it
+        if (found === null || found < 1) {
+            p2 = i;
+        }
+        //let p2 = i; //starts from the left
+        //console.log(p2);
+        found = null; // turn found back to null
+        //let found = null;
         let iProd = prodArr[i - 1] !== undefined ? prodArr[i - 1] : BigInt(1);
+        //console.log(p2);
         let prod1 = Infinity;
         let prod2 = -Infinity;
-        let found = null;
         while (found === null && p1 >= i && p2 < nums.length) {
             prod1 = prodArr[p1] / BigInt(iProd);
             prod2 = prodArr[p2] / BigInt(iProd);
-            //console.log(prod);
+            //console.log(prod1);
             if (prod1 >= BigInt(k)) {
                 p1--;
             } else {
@@ -234,10 +242,10 @@ var numSubarrayProductLessThanK = function (nums, k) {
     return res;
 };
 
-//console.log(numSubarrayProductLessThanK([10, 5, 2, 6], 100));
-//console.log(numSubarrayProductLessThanK([10, 9, 10, 4, 3, 8, 3, 3, 6, 2, 10, 10, 9, 3], 19));
-//console.log(numSubarrayProductLessThanK([1, 2, 3], 0));
-//console.log(numSubarrayProductLessThanK([10, 2, 2, 5, 4, 4, 4, 3, 7, 7], 289));
+console.log(numSubarrayProductLessThanK([10, 5, 2, 6], 100));
+console.log(numSubarrayProductLessThanK([10, 9, 10, 4, 3, 8, 3, 3, 6, 2, 10, 10, 9, 3], 19));
+console.log(numSubarrayProductLessThanK([1, 2, 3], 0));
+console.log(numSubarrayProductLessThanK([10, 2, 2, 5, 4, 4, 4, 3, 7, 7], 289));
 //10
 //2
 //10, 2
