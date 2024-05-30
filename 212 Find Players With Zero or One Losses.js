@@ -38,7 +38,51 @@ Constraints:
     All matches[i] are unique.
 */
 
-var findWinners = function (matches) {};
+var findWinners = function (matches) {
+    //const winners = {};
+    const loosers = {};
+    let teams = new Set();
+
+    for (let i = 0; i < matches.length; i++) {
+        const arr = matches[i];
+        const w = arr[0];
+        const l = arr[1];
+        teams.add(w);
+        teams.add(l);
+        // if (winners[w] === undefined) {
+        //     winners[w] = 1;
+        // } else {
+        //     winners[w]++;
+        // }
+        if (loosers[l] === undefined) {
+            loosers[l] = 1;
+        } else {
+            loosers[l]++;
+        }
+    }
+
+    // //console.log("winners:", winners);
+    teams = Array.from(teams).sort((a, b) => a - b);
+    // console.log("teams:", teams);
+    // console.log("loosers:", loosers);
+
+    const notLost = [];
+    const lostOne = [];
+
+    for (let team of teams) {
+        // console.log(team);
+
+        if (loosers[team] === 1) {
+            lostOne.push(team);
+        }
+
+        if (loosers[team] === undefined) {
+            notLost.push(team);
+        }
+    }
+
+    return [notLost, lostOne];
+};
 
 console.log(
     findWinners([
