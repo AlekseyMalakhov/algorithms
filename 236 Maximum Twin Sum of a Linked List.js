@@ -86,17 +86,19 @@ var pairSum = function (head) {
         return newHead;
     };    
     */
-    console.log(prevNodeBeforeMiddle);
-    console.log(middle);
-    /*
-    let head2 = middle;
-    let curr = middle.next;
+    // console.log(prevNodeBeforeMiddle);
+    // console.log(middle);
+
+    let head2 = null;
+    let curr = middle;
     while (curr) {
         const temp = curr.next; //save next
         curr.next = head2; //swap 1
         head2 = curr; //swap 2
         curr = temp; //move on
     }
+
+    prevNodeBeforeMiddle.next = head2;
 
     console.log(head?.val);
     console.log(head?.next?.val);
@@ -115,7 +117,6 @@ var pairSum = function (head) {
     // console.log(head2?.next?.next?.next?.next?.next?.val);
     // console.log(head2?.next?.next?.next?.next?.next?.next?.val);
     // console.log(head2?.next?.next?.next?.next?.next?.next?.next?.val);
-    */
 
     //see 237
 
