@@ -58,11 +58,13 @@ const createLinkedList = (arr) => {
 
 var pairSum = function (head) {
     //1) Find the middle of the linked list using the fast and slow pointer technique from the previous article.
+    let n = 0;
     let slow = head;
     let fast = head.next;
 
     let prevNodeBeforeMiddle = null;
     while (fast) {
+        n++;
         prevNodeBeforeMiddle = slow;
         slow = slow?.next;
         fast = fast?.next?.next;
@@ -86,8 +88,8 @@ var pairSum = function (head) {
         return newHead;
     };    
     */
-    // console.log(prevNodeBeforeMiddle);
-    // console.log(middle);
+    // // // console.log(prevNodeBeforeMiddle);
+    // // // console.log(middle);
 
     let head2 = null;
     let curr = middle;
@@ -100,27 +102,51 @@ var pairSum = function (head) {
 
     prevNodeBeforeMiddle.next = head2;
 
-    console.log(head?.val);
-    console.log(head?.next?.val);
-    console.log(head?.next?.next?.val);
-    console.log(head?.next?.next?.next?.val);
-    console.log(head?.next?.next?.next?.next?.val);
-    console.log(head?.next?.next?.next?.next?.next?.val);
-    console.log(head?.next?.next?.next?.next?.next?.next?.val);
-    console.log(head?.next?.next?.next?.next?.next?.next?.next?.val);
+    // // console.log(head?.val);
+    // // console.log(head?.next?.val);
+    // // console.log(head?.next?.next?.val);
+    // // console.log(head?.next?.next?.next?.val);
+    // // console.log(head?.next?.next?.next?.next?.val);
+    // // console.log(head?.next?.next?.next?.next?.next?.val);
+    // // console.log(head?.next?.next?.next?.next?.next?.next?.val);
+    // // console.log(head?.next?.next?.next?.next?.next?.next?.next?.val);
 
-    // console.log(head2?.val);
-    // console.log(head2?.next?.val);
-    // console.log(head2?.next?.next?.val);
-    // console.log(head2?.next?.next?.next?.val);
-    // console.log(head2?.next?.next?.next?.next?.val);
-    // console.log(head2?.next?.next?.next?.next?.next?.val);
-    // console.log(head2?.next?.next?.next?.next?.next?.next?.val);
-    // console.log(head2?.next?.next?.next?.next?.next?.next?.next?.val);
-
-    //see 237
+    // // // console.log(head2?.val);
+    // // // console.log(head2?.next?.val);
+    // // // console.log(head2?.next?.next?.val);
+    // // // console.log(head2?.next?.next?.next?.val);
+    // // // console.log(head2?.next?.next?.next?.next?.val);
+    // // // console.log(head2?.next?.next?.next?.next?.next?.val);
+    // // // console.log(head2?.next?.next?.next?.next?.next?.next?.val);
+    // // // console.log(head2?.next?.next?.next?.next?.next?.next?.next?.val);
 
     //3) After reversing the second half, every node is spaced n / 2 apart from its pair node, where n is the number of nodes in the list which we can find from step 1.
+    let p1 = head;
+    let p2 = head;
+    for (let i = 0; i < n; i++) {
+        p2 = p2.next;
+    }
+
+    let maxSum = -Infinity;
+    while (p2) {
+        // console.log("p1:", p1?.val);
+        // console.log("p2:", p2?.val);
+
+        if (p1?.val !== undefined && p2?.val !== undefined) {
+            const sum = p1?.val + p2?.val;
+            // // console.log("sum:", sum);
+            if (sum > maxSum) {
+                maxSum = sum;
+            }
+        }
+
+        p1 = p1.next;
+        p2 = p2.next;
+        // console.log("---------");
+    }
+
+    return maxSum;
+
     //4) With that in mind, create another fast pointer n / 2 ahead of slow. Now, just iterate n / 2 times from head to find every pair sum slow.val + fast.val.
 };
 
@@ -128,13 +154,13 @@ const ll1 = createLinkedList([5, 4, 2, 1]);
 const ll2 = createLinkedList([4, 2, 2, 3]);
 const ll3 = createLinkedList([1, 100000]);
 
-console.log(pairSum(ll1));
+// console.log(pairSum(ll1));
 
-// console.log(ll1?.val);
-// console.log(ll1?.next?.val);
-// console.log(ll1?.next?.next?.val);
-// console.log(ll1?.next?.next?.next?.val);
-// console.log(ll1?.next?.next?.next?.next?.val);
-// console.log(ll1?.next?.next?.next?.next?.next?.val);
-// console.log(ll1?.next?.next?.next?.next?.next?.next?.val);
-// console.log(ll1?.next?.next?.next?.next?.next?.next?.next?.val);
+// // // console.log(ll1?.val);
+// // // console.log(ll1?.next?.val);
+// // // console.log(ll1?.next?.next?.val);
+// // // console.log(ll1?.next?.next?.next?.val);
+// // // console.log(ll1?.next?.next?.next?.next?.val);
+// // // console.log(ll1?.next?.next?.next?.next?.next?.val);
+// // // console.log(ll1?.next?.next?.next?.next?.next?.next?.val);
+// // // console.log(ll1?.next?.next?.next?.next?.next?.next?.next?.val);
