@@ -65,11 +65,25 @@ const createLinkedList = (arr) => {
     return head;
 };
 
+const consoleLogLinkedList = (head, n) => {
+    let h = head;
+    for (let i = 1; i <= n; i++) {
+        console.log(h?.val);
+        h = h?.next;
+    }
+};
+
 var reverseEvenLengthGroups = function (head) {
     //initial state
     //it's better to start from a dummy node
     const dummyHead = new ListNode(null);
     dummyHead.next = head;
+    let revGroupHead = null; // head of the group which is currently reversing
+    let lastUneven = null; //last element in the previous uneven group where we will connect our reversed group head
+    let temp = null; //temporary element which will become current on the next step
+    let prev = null; //just prev element - just in case
+    let tail = null; //first element in the group which has to be yet reversed. In the end it will become a tail of this group and
+    //has to be connected to the last element of group to be reversed .next
     let current = dummyHead;
     let n = 0;
 
@@ -83,7 +97,15 @@ var reverseEvenLengthGroups = function (head) {
     //move item by item
     while (current) {
         //make step
-        current = current.next;
+        prev = current;
+        console.log("prev:", prev);
+        if (temp) {
+            //if we have saved current element - use it
+            current = temp;
+        } else {
+            current = current.next;
+        }
+        console.log("current:", current);
         if (current !== null) {
             //if step is not the last one
             n++; //increase the item counter
@@ -99,25 +121,79 @@ var reverseEvenLengthGroups = function (head) {
             console.log("currentNumberOfItems:", currentNumberOfItems);
             console.log("groupNumber:", groupNumber);
 
-            let even = false;
             if (groupNumber % 2 === 0) {
-                even = true;
+                //if group number is even - reverse the nodes
+                //save next current in temp for not to lose it in reversing process
+                temp = current.next;
+                if (tail === null) {
+                    console.log("tail is null");
+                    console.log("temp:", temp);
+                    //if tail is null - it means the group is yet to be reversed
+                    //so make our current node a tail of this group. Later we will connect to
+                    //thLastElementIn this group.next
+                    tail = current;
+                    //and to prevent circular reference in the end - tail.next should point to null
+                    //if it is not true we will correct it later
+                    tail.next = null;
+                    console.log("tail:", tail);
+                    //and at the same timefor the current step it will be a head of our
+                    //reversing group
+                    revGroupHead = current;
+                    console.log("revGroupHead:", revGroupHead);
+                    //Previous element will become lastUneven. To this element we will connect
+                    //all the elements in this group during reversing process
+                    lastUneven = prev;
+                    console.log("lastUneven:", lastUneven);
+                } else {
+                    console.log("tail is not null");
+                    //if tail is not null, it means we are already in the process of reversing
+                    //first of all lets save the element we will go next after reversing this
+                    //otherwise it may be lost
+                    console.log("temp:", temp);
+                    //then grab the current element and connect the head to it
+                    current.next = revGroupHead;
+                    //then make current a head of this reversing group
+                    revGroupHead = current;
+                    console.log("revGroupHead:", revGroupHead);
+                    //then connect lastUneven to the new head
+                    lastUneven.next = revGroupHead;
+                    console.log("lastUneven:", lastUneven);
+                    //if temp became null - it means it is the end of the list
+                    if (temp === null) {
+                        console.log("END___________________________END__________________________END");
+                        current = null;
+                    }
+                }
+            } else {
+                //if current element does not belong to the reversing group it means it either a
+                //just normal element or this is the first element of the group after the
+                //reversed group so we should connect a tail of the reversed group to it
+                console.log("uneven group");
+                if (tail !== null) {
+                    console.log("tail is not null");
+                    //if tail is not null, it means there is not connected reversed group here
+                    //so lets connect it and finish it
+                    tail.next = current;
+                    console.log("tail:", tail);
+                    //and set to null all the variables which belong to the reversed group
+                    temp = null;
+                    tail = null;
+                    revGroupHead = null;
+                    lastUneven = null;
+                }
             }
-            console.log("even:", even);
         }
+        consoleLogLinkedList(ll1, 12);
         console.log("--------------------");
+        if (n > 11) {
+            return;
+        }
     }
+    return head;
 };
 
-const ll1 = createLinkedList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+const ll1 = createLinkedList([1, 1, 0, 6, 5]);
 
 const ll1reversed = reverseEvenLengthGroups(ll1, 5);
 
-// console.log(ll1reversed?.val);
-// console.log(ll1reversed?.next?.val);
-// console.log(ll1reversed?.next?.next?.val);
-// console.log(ll1reversed?.next?.next?.next?.val);
-// console.log(ll1reversed?.next?.next?.next?.next?.val);
-// console.log(ll1reversed?.next?.next?.next?.next?.next?.val);
-// console.log(ll1reversed?.next?.next?.next?.next?.next?.next?.val);
-// console.log(ll1reversed?.next?.next?.next?.next?.next?.next?.next?.val);
+//consoleLogLinkedList(ll1, 10);
