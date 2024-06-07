@@ -76,9 +76,9 @@ var simplifyPath = function (path) {
 
     const res = [];
 
-    //console.log(arr);
+    // //console.log(arr);
     for (let i = 0; i < arr.length; i++) {
-        console.log(res);
+        // console.log(res);
 
         const item = arr[i];
         if (item !== "" && item !== ".") {
@@ -86,11 +86,12 @@ var simplifyPath = function (path) {
         }
         if (item === "..") {
             res.pop();
+            res.pop();
         }
     }
 
     return "/" + res.join("/");
 };
 
-//console.log(simplifyPath("/home/"));
-console.log(simplifyPath("/home/user/Documents/../Pictures"));
+// //console.log(simplifyPath("/home/"));
+// console.log(simplifyPath("/home/user/Documents/../Pictures"));
