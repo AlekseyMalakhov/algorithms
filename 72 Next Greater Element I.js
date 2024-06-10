@@ -54,20 +54,20 @@ var nextGreaterElement = function (nums1, nums2) {
     const map = new Map(); // map for next greater element
     const stack = [];
     for (let num of nums2) {
-        console.log("---------------");
-        console.log("num = " + num);
+        // console.log("---------------");
+        // console.log("num = " + num);
         while (stack.length && stack[stack.length - 1] < num) {
             // Pop elements from stack and update map with next greater element
-            console.log("stack = " + stack);
+            // console.log("stack = " + stack);
             const someStackPop = stack.pop();
-            console.log("someStackPop = " + someStackPop);
+            // console.log("someStackPop = " + someStackPop);
             map.set(someStackPop, num);
         }
-        console.log("num after = " + num);
+        // console.log("num after = " + num);
         stack.push(num); // Push current element onto stack
-        console.log("stack after = " + stack);
+        // console.log("stack after = " + stack);
     }
-    console.log(map);
+    // console.log(map);
     for (let i = 0; i < nums1.length; i++) {
         // Check if each element in nums1 has a next greater element in map
         nums1[i] = map.has(nums1[i]) ? map.get(nums1[i]) : -1; // Update element in nums1 with next greater element or -1
@@ -75,8 +75,8 @@ var nextGreaterElement = function (nums1, nums2) {
     return nums1;
 };
 
-//console.log(nextGreaterElement([4, 1, 2], [1, 3, 4, 2]));
-//console.log(nextGreaterElement([2, 4], [1, 2, 3, 4]));
-console.log(nextGreaterElement([2, 4], [7, 1, 2, 5, 9, 4]));
+// //console.log(nextGreaterElement([4, 1, 2], [1, 3, 4, 2]));
+// //console.log(nextGreaterElement([2, 4], [1, 2, 3, 4]));
+// console.log(nextGreaterElement([2, 4], [7, 1, 2, 5, 9, 4]));
 
-//console.log(nextGreaterElement([1, 3, 5, 2, 4], [6, 5, 4, 3, 2, 1, 7]));
+// //console.log(nextGreaterElement([1, 3, 5, 2, 4], [6, 5, 4, 3, 2, 1, 7]));
