@@ -202,161 +202,23 @@ var mostCompetitive = function (nums, k) {
 };
 */
 var mostCompetitive = function (nums, k) {
-    //first of all we should find the next closest min value position for every current position
-    //until the nums.length - k position
-
-    //we should start selecting value not later than the border position.
-    //because if we start later, even if ve take all the values left we still won't be able
-    //to get k length res array
-    //so. It means - starting point, should be not later then border position
-    //So to find starting point, we should check the items from 0 to the border position
-    //and find the minimum - this will be the starting point
-
-    //After we selected starting point, we should find the next border. Next border will be
-    //nums.length - k + 1
-    //So from starting point till border we should find the next minimum. We can't cross the
-    //border. Because after border we should just select all items just to be able to fill
-    //res array with k elements
-    //after we found the next minimum we calculate the next border
-    //border = nums.length - k + 2
-    //and betweeen current minimum and the new border we will search for the next minimum
-
-    //let start = 0;
-    let border = nums.length - k; //starting from this position (inclusive) we should select all elements just to fill resulting array
-    // console.log("border:", border);
-    // console.log("border value:", nums[border]);
-    const res = [];
-
-    //let's create a stack of minimum values for the initial section
-    //values should be sorted in stack from the maximum to the
-    //minimum
-
-    const arr = [];
-    for (let i = 0; i <= border; i++) {
-        const obj = {
-            value: nums[i],
-            index: i,
-        };
-        arr.push(obj);
-    }
-
-    // //console.log("arr:", arr);
-
-    const minStack = arr.toSorted((a, b) => a.value - b.value).reverse();
-
-    console.log("minStack:", minStack);
-
-    let min = minStack.pop();
-    console.log(min);
-    //console.log("minStack:", minStack);
-
-    //now when we found minimum for the initial section
-    //we can increment our border by one and check the next included value
-    //if it is less then min - update minimum
-
-    let minPos = min.index;
-
-    while (res.length !== k) {
-        // console.log("minStack:", minStack);
-
-        if (minPos === border) {
-            // console.log("here1");
-            //it means the minimum position is border - it means we should include it and all the rest items to fill the res array
-            return res.concat(nums.slice(border));
-        } else {
-            // console.log("here2");
-            //add min value to res array
-            // console.log("min:", min);
-            res.push(min.value);
-            //move border by 1 step
-            border++;
-            //create new object with new border value
-            const obj = {
-                value: nums[border],
-                index: border,
-            };
-            //somehow we should add it on minStack in a proper position
-            //sorting stack after every add operation is very time consuming
-            //lets try using monolithic stack - use while loop
-            let last = minStack[minStack.length - 1];
-            let temp = [];
-            // console.log("last:", last);
-            // console.log("obj:", obj);
-            //let fdsgdf = 0;
-            while (minStack.length > 0 && last.value < obj.value) {
-                // console.log("---------1 small while-----------");
-                let lastObj = minStack.pop();
-                // console.log("lastObj:", lastObj);
-                // console.log("minStack:", minStack);
-                temp.push(lastObj);
-                last = minStack[minStack.length - 1];
-                //debug
-                // fdsgdf++;
-                // if (fdsgdf > 20) {
-                //     return;
-                // }
-            }
-            //when finally last obj is bigger then new obj, we can put it here and put all the temp elements on the top
-            //additionnaly we should put only those elements whose index is more then current minPos
-            minStack.push(obj);
-            // console.log("here5");
-            while (temp.length > 0) {
-                // console.log("---------2 small while-----------");
-                const tempObj = temp.pop();
-                //if position of temp is more then the current min we will push it. may be later we will need it. But if index less - don't add it.
-                //We will never return back
-                if (tempObj.index > minPos) {
-                    minStack.push(tempObj);
-                }
-            }
-
-            //get new min
-            min = minStack.pop();
-            // console.log("new min:", min);
-            minPos = min.index;
+    let stack = [];
+    for (let i = 0; i < nums.length; i++) {
+        while (stack.length > 0 && nums[i] < stack[stack.length - 1] && nums.length - i - 1 >= k - stack.length) {
+            stack.pop();
+            console.log("pop");
+            console.log(stack);
+            console.log("-------");
         }
-        // console.log(res);
-        // console.log("------------main while--------------------");
+        if (stack.length < k) {
+            stack.push(nums[i]);
+            console.log("push");
+        }
+        console.log(stack);
+        console.log("-------");
     }
-
-    return res;
+    return stack;
 };
 
-// //console.log(mostCompetitive([3, 5, 2, 6], 2));
-// //console.log(mostCompetitive([2, 4, 3, 3, 5, 4, 9, 6], 4));
-// // console.log(mostCompetitive([71, 18, 52, 29, 55, 73, 24, 42, 66, 8, 80, 2], 3));
-// //console.log(mostCompetitive([84, 10, 71, 23, 66, 61, 62, 64, 34, 41, 80, 25, 91, 43, 4, 75, 65, 13, 37, 41, 46, 90, 55, 8, 85, 61, 95, 71], 24));
-//[10,23,61,62,34,41,80,25,91,43,4,75,65,13,37,41,46,90,55,8,85,61,95,71]...
-
-// // console.log(
-// //     mostCompetitive(
-// //         [
-// //             11, 52, 57, 91, 47, 95, 86, 46, 87, 47, 70, 56, 54, 61, 89, 44, 3, 73, 1, 7, 87, 48, 17, 25, 49, 54, 6, 72, 97, 62, 16, 11, 47, 34, 68,
-// //             58, 14, 36, 46, 65, 2, 15,
-// //         ],
-// //         18
-// //     )
-// // );
-
-const task = [
-    2, 10, 3, 5, 9, 4, 2, 0, 6, 7, 8, 0, 6, 5, 8, 1, 6, 1, 5, 5, 2, 10, 9, 5, 7, 7, 3, 2, 1, 4, 0, 7, 0, 3, 10, 10, 5, 10, 4, 7, 0, 2, 10, 9, 0, 2, 6,
-    10, 6, 9, 2, 1, 9, 8, 7, 2, 0, 7, 3, 6, 2, 1, 8, 0, 0, 0, 10, 4, 3, 5, 0, 8, 1, 8, 5, 1, 6, 0, 4, 4, 10, 2, 0, 5, 1, 1, 3, 3, 5, 2, 6, 5, 6, 0, 3,
-    8, 0, 1, 7, 0, 0, 9, 6, 10, 5, 9, 8, 9, 8, 7, 8, 10, 6, 3, 8, 0, 5, 7, 4, 3, 5, 7, 7, 0, 3, 10, 1, 3, 10, 2, 10, 3, 2, 6, 3, 10, 8, 10, 6, 0, 7,
-    6, 2, 10, 4, 0, 7, 4, 8, 8, 1, 7, 1, 4, 9, 7, 7, 8, 9, 8, 7, 2, 4, 9, 8, 8, 0, 8, 2, 10, 7, 3, 10, 8, 5, 1, 1, 3, 0, 5, 1, 7, 1, 7, 9, 2, 6, 9, 6,
-    10, 6, 1, 7, 8, 3, 6, 9, 3, 5, 9, 0, 9, 3, 5, 8, 4, 6, 8, 10, 8, 0, 9, 3, 7, 10, 4, 4, 2, 3, 7, 2, 10, 3, 5, 4, 9, 9, 2, 1, 2, 10, 4, 4, 4, 3, 5,
-    9, 7, 2, 0, 3, 6, 6, 7, 3, 9, 4, 6, 9, 7, 1, 3, 2, 3, 6, 6, 1, 7, 10, 0, 4, 10, 3, 5, 0, 10, 3, 10, 3, 0, 0, 1, 6, 6, 5, 9, 10, 5, 5, 9, 0, 5, 4,
-    1, 10, 2, 3, 1, 7, 9, 10, 10, 4, 3, 5, 9, 5, 4, 4, 8, 0, 1, 8, 1, 4, 6, 5, 6, 0, 6, 8, 6, 5, 6, 5, 7, 9, 5, 8, 8, 4, 2, 0, 0, 2, 9, 4, 9, 2, 6, 5,
-    2, 2, 8, 5, 4, 10, 8, 7, 7, 3, 4, 2, 0, 4, 3, 8, 6, 1, 7, 10, 10, 7, 4, 0, 6, 6, 0, 5, 6, 10, 3, 8, 3, 2, 4, 10, 4, 3, 0, 4, 10, 7, 6, 0, 4, 7, 0,
-    5, 2, 5, 2, 10, 9, 1, 10, 9, 6, 6, 5, 9, 10, 1, 3, 5, 2, 0, 6, 8, 5, 6, 3, 4, 8, 4, 0, 7, 0, 7, 9, 9, 1, 4, 6, 4, 5, 7, 3, 0, 4, 4, 9, 10, 5, 10,
-    3, 9, 6, 6, 2, 9, 4, 0, 4, 3, 3, 1, 7, 2, 1, 0, 2, 6, 7, 1, 1, 0, 3, 9, 8, 9, 4, 6, 3, 10, 7, 3, 1, 5, 2, 0, 3, 9, 5, 3, 3, 3, 1, 7, 5, 8, 10, 10,
-    8, 0, 2, 3, 3, 2, 9, 3, 1, 3, 9, 0, 1, 8, 2, 1, 6, 0, 6, 3, 1, 3, 1, 10, 5, 6, 0, 4, 7, 10,
-];
-
-console.log(task.length);
-console.log(mostCompetitive(task, 79));
-
-const check = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-];
-console.log("nulls length = " + check.length);
-//[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,3,3,2,9,3,1,3,9,0,1,8,2,1,6,0,6,3,1,3,1,10,5,6,0,4,7,10]...
+//console.log(mostCompetitive([2, 4, 3, 3, 5, 4, 9, 6], 4));
+console.log(mostCompetitive([71, 18, 52, 29, 55, 73, 24, 42, 66, 8, 80, 2], 3));
