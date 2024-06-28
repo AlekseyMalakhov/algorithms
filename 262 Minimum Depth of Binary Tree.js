@@ -30,19 +30,25 @@ const createTree = (arr) => {
     const arrOfNodes = [];
 
     for (let i = 0; i < arr.length; i++) {
-        const node = new TreeNode(arr[i], null, null);
+        let node = null;
+        if (arr[i]) {
+            node = new TreeNode(arr[i], null, null);
+        }
         arrOfNodes.push(node);
     }
+    // console.log(arrOfNodes);
 
     for (let i = 0; i < arrOfNodes.length; i++) {
         const node = arrOfNodes[i];
-        const left = arrOfNodes[i * 2 + 1];
-        const right = arrOfNodes[i * 2 + 2];
-        if (left) {
-            node.left = left;
-        }
-        if (right) {
-            node.right = right;
+        if (node) {
+            const left = arrOfNodes[i * 2 + 1];
+            const right = arrOfNodes[i * 2 + 2];
+            if (left) {
+                node.left = left;
+            }
+            if (right) {
+                node.right = right;
+            }
         }
     }
 
@@ -51,8 +57,22 @@ const createTree = (arr) => {
 };
 
 const tree = createTree([3, 9, 20, null, null, 15, 7]);
-console.log(tree);
+// console.log(tree);
 
-var minDepth = function (root) {};
+console.log(minDepth(tree));
 
-//console.log(minDepth(tree));
+var minDepth = function (root) {
+    if (!root) {
+        return 0;
+    }
+    const leftDepth = minDepth(root.left);
+    const rightDepth = minDepth(root.right);
+
+    if (leftDepth && rightDepth) {
+        return Math.min(leftDepth, rightDepth) + 1;
+    } else if (leftDepth) {
+        return leftDepth + 1;
+    } else {
+        return rightDepth + 1;
+    }
+};
