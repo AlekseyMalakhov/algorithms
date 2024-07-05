@@ -28,20 +28,8 @@ Constraints:
 */
 
 var insertIntoBST = function (root, val) {
-    // console.log("------------------- new start ---------------------");
-    // console.log("root.val: " + root.val);
-    // console.log("root.left: " + JSON.stringify(root.left));
-    // console.log("root.right: " + JSON.stringify(root.right));
-    // console.log("root.left.val: " + root.left?.val);
-    // console.log("root.right.val: " + root.right?.val);
-
-    /*  
-    If val > node.val - go to insert into the right subtree.
-    If val < node.val - go to insert into the left subtree.    
-    */
-
     if (!root) {
-        return null;
+        return new TreeNode(val);
     }
 
     //base case - insertion
@@ -51,11 +39,11 @@ var insertIntoBST = function (root, val) {
         //if val is less then root.val - add it to the left
         if (val < root.val) {
             // console.log("add to left");
-            root.left = new TreeNode(val);
+            root.left = insertIntoBST(null, val);
         } else if (val > root.val) {
             // console.log("add to right");
             //if val is more then root.val - add it to the right
-            root.right = new TreeNode(val);
+            root.right = insertIntoBST(null, val);
         }
         // console.log(JSON.stringify(root));
         return root;
@@ -66,7 +54,7 @@ var insertIntoBST = function (root, val) {
         //if root.left is null and root right is not null - it means we have a possibility to add our val here
         if (val < root.val) {
             //if val is less then root.val, then we can easilty drop it here - root.right in any case will be bigger - otherwise it would not be a BST
-            root.left = new TreeNode(val);
+            root.left = insertIntoBST(null, val);
         } else {
             //else go deeper
             root.right = insertIntoBST(root.right, val);
@@ -79,7 +67,7 @@ var insertIntoBST = function (root, val) {
         // console.log("base case right empty");
         //if val is more then root.val  - we can add it to the right. Left in any case will be less - because it's a BST
         if (val > root.val) {
-            root.right = new TreeNode(val);
+            root.right = insertIntoBST(null, val);
         } else {
             //else go deeper
             root.left = insertIntoBST(root.left, val);
@@ -97,65 +85,4 @@ var insertIntoBST = function (root, val) {
 
     // console.log("root: " + JSON.stringify(root, null, 2));
     return root;
-
-    //we check left and right and select the way
-    //after there is no way we add
 };
-
-/*
-const answer2 = {
-    val: 4,
-    left: {
-        val: 2,
-        left: {
-            val: 1,
-            left: null,
-            right: null,
-        },
-        right: {
-            val: 3,
-            left: null,
-            right: null,
-        },
-    },
-    right: {
-        val: 7,
-        left: {
-            val: 5,
-            left: null,
-            right: null,
-        },
-        right: null,
-    },
-};
-
-const answer = {
-    val: 4,
-    left: {
-        val: 2,
-        left: {
-            val: 1,
-            left: null,
-            right: null,
-        },
-        right: {
-            val: 3,
-            left: null,
-            right: {
-                val: 5,
-                left: null,
-                right: null,
-            },
-        },
-    },
-    right: {
-        val: 7,
-        left: null,
-        right: null,
-    },
-};
-
-var insertIntoBST = function (root, val) {
-    return answer;
-};
-*/
