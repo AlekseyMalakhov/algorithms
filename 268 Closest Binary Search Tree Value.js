@@ -16,7 +16,7 @@ Constraints:
     -109 <= target <= 109
 */
 
-var closestValue = function (root, target) {
+var closestValueOld = function (root, target) {
     console.log("-----------------------------------------------");
     console.log("root.left: " + root.left?.val);
     console.log("root.val: " + root.val);
@@ -160,5 +160,46 @@ var closestValue = function (root, target) {
 };
 
 /*
+No. We should go along the all branches of BST until we found a leaf.
+And keep track of closest values found. Then select minimum.
+It looks like we should check all the nodes. Because the
+closest value can be hiding on every branch
+
+lets traverse the whole tree and find minimum
 
 */
+
+var closestValue = function (root1, target) {
+    let diff = Infinity;
+    let found = 0;
+
+    const check = (root) => {
+        if (!root) {
+            return null;
+        }
+
+        const d = Math.abs(target - root.val);
+        if (d < diff) {
+            diff = d;
+            found = root.val;
+        }
+
+        if (diff === d) {
+            if (root.val < found) {
+                found = root.val;
+            }
+        }
+
+        if (root.left) {
+            check(root.left);
+        }
+
+        if (root.right) {
+            check(root.right);
+        }
+    };
+
+    check(root1);
+
+    return found;
+};
