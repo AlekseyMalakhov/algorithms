@@ -29,16 +29,8 @@ Constraints:
     There are no self edges.
 */
 
+/*
 var validPath = function (n, edges, source, destination) {
-    //for easy check the root existence let's create a map
-    const routes = new Map();
-    for (const val of edges) {
-        const valReversed = [val[1], val[0]];
-        routes.set(JSON.stringify(val), false);
-        routes.set(JSON.stringify(valReversed), false);
-    }
-    // //console.log("routes:", routes);
-
     //first of all, let's check is there is a direct route
     if (routes.has(JSON.stringify([source, destination]))) {
         return true;
@@ -48,6 +40,15 @@ var validPath = function (n, edges, source, destination) {
     if (edges.length === 0 && source === 0 && destination === 0) {
         return true;
     }
+
+    //for easy check the root existence let's create a map
+    const routes = new Map();
+    for (const val of edges) {
+        const valReversed = [val[1], val[0]];
+        routes.set(JSON.stringify(val), false);
+        routes.set(JSON.stringify(valReversed), false);
+    }
+    // //console.log("routes:", routes);
 
     //if not - let's create a path
     //we will put different routs into stack, and if route is not correct we will remove it from the stack until we find a correct one
@@ -118,6 +119,39 @@ var validPath = function (n, edges, source, destination) {
     // console.log(path);
     return res ? true : false;
 };
+*/
+
+var validPath = function (n, edges, source, destination) {
+    //check edge case
+    if (edges.length === 0 && source === 0 && destination === 0) {
+        return true;
+    }
+
+    const edgesWithBackRoutes = [];
+    for (const val of edges) {
+        const valReversed = [val[1], val[0]];
+        edgesWithBackRoutes.push(val);
+        edgesWithBackRoutes.push(valReversed);
+
+        //and at the same time check if there is a direct route
+        if ((val[1] === source && val[0] === destination) || (val[0] === source && val[1] === destination)) {
+            return true;
+        }
+    }
+
+    console.log("edgesWithBackRoutes:", edgesWithBackRoutes);
+
+    //let's create a list of directions for every point
+    // const routesForPoint = [];
+    // for (let i = 0; i < n; i++) {
+    //     const arr = [];
+    //     for (const val of edges) {
+    //         const valReversed = [val[1], val[0]];
+    //         routes.set(JSON.stringify(val), false);
+    //         routes.set(JSON.stringify(valReversed), false);
+    //     }
+    // }
+};
 
 // // console.log(
 // //     validPath(
@@ -147,19 +181,19 @@ var validPath = function (n, edges, source, destination) {
 // //     )
 // // );
 
-// // console.log(
-// //     validPath(
-// //         5,
-// //         [
-// //             [0, 1],
-// //             [0, 2],
-// //             [0, 3],
-// //             [2, 4],
-// //         ],
-// //         0,
-// //         4
-// //     )
-// // );
+console.log(
+    validPath(
+        5,
+        [
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [2, 4],
+        ],
+        0,
+        4
+    )
+);
 
 // // console.log(
 // //     validPath(
