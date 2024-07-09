@@ -153,6 +153,66 @@ var validPath = function (n, edges, source, destination) {
         routesForPoint.push(arr);
     }
     console.log("routesForPoint:", routesForPoint);
+    /*
+    routesForPoint: [
+        [ [ 0, 1 ], [ 0, 2 ], [ 0, 3 ] ],
+        [ [ 1, 0 ] ],
+        [ [ 2, 0 ], [ 2, 4 ] ],
+        [ [ 3, 0 ] ],
+        [ [ 4, 2 ] ]
+      ]
+        */
+
+    //create a stack for routes
+    const path = [];
+
+    //create an object to easily check if route is used
+    const used = {};
+    //when we put route into stack we will at the same time put it into used object
+
+    const checkRoutes = (prevPoint, point) => {
+        console.log("--------------------New checkRoutes call------------------------");
+        console.log("point:", point);
+        const routes = routesForPoint[point];
+        for (const route of routes) {
+            console.log("route:", route);
+            const isUsed = used[JSON.stringify(route)];
+            if (!isUsed && route[1] !== prevPoint) {
+                //if this route does not lead back to the previous point
+                //add this route to the path
+                console.log("good route found " + route);
+                path.push(route);
+                used[JSON.stringify(route)] = true;
+                //create new point to go
+                const newPoint = route[1];
+                //update previous point
+                const newPrevPoint = point;
+                // console.log("prevPoint:", newPrevPoint);
+                // console.log("newPoint:", newPoint);
+                if (newPoint === destination) {
+                    console.log("-------------this is destination!------------");
+                    return true;
+                } else {
+                    // console.log("Run new checkRoutes with prevPoint = " + newPrevPoint + ", and point = " + newPoint);
+                    const res = checkRoutes(newPrevPoint, newPoint);
+                    if (res) {
+                        return true;
+                    } else {
+                        //this route we recently added is wrong. Remove it from stack
+                        const wrongPath = path.pop();
+                        console.log("wrongPath --------------:", wrongPath);
+                    }
+                }
+            }
+        }
+        //if we checked all routes but have not found correct one, probably
+        //this route is wrong
+        return false;
+    };
+
+    const res = checkRoutes(null, source);
+    console.log(path);
+    return res;
 };
 
 // // console.log(
@@ -168,49 +228,50 @@ var validPath = function (n, edges, source, destination) {
 // //     )
 // // );
 
-// // console.log(
-// //     validPath(
-// //         6,
-// //         [
-// //             [0, 1],
-// //             [0, 2],
-// //             [3, 5],
-// //             [5, 4],
-// //             [4, 3],
-// //         ],
-// //         0,
-// //         5
-// //     )
-// // );
+// console.log(
+//     validPath(
+//         6,
+//         [
+//             [0, 1],
+//             [0, 2],
+//             [3, 5],
+//             [5, 4],
+//             [4, 3],
+//         ],
+//         0,
+//         5
+//     )
+// );
 
-console.log(
-    validPath(
-        5,
-        [
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [2, 4],
-        ],
-        0,
-        4
-    )
-);
+// console.log(
+//     validPath(
+//         5,
+//         [
+//             [0, 1],
+//             [0, 2],
+//             [0, 3],
+//             [2, 4],
+//         ],
+//         0,
+//         4
+//     )
+// );
 
-// // console.log(
-// //     validPath(
-// //         6,
-// //         [
-// //             [0, 1],
-// //             [0, 3],
-// //             [0, 5],
-// //             [2, 5],
-// //             [4, 2],
-// //         ],
-// //         0,
-// //         4
-// //     )
-// // );
+// console.log(
+//     validPath(
+//         6,
+//         [
+//             [0, 1],
+//             [0, 3],
+//             [0, 5],
+//             [2, 5],
+//             [4, 2],
+//             [3, 2],
+//         ],
+//         0,
+//         4
+//     )
+// );
 
 // console.log(validPath(1, [], 0, 0));
 
