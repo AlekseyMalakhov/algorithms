@@ -142,15 +142,17 @@ var validPath = function (n, edges, source, destination) {
     console.log("edgesWithBackRoutes:", edgesWithBackRoutes);
 
     //let's create a list of directions for every point
-    // const routesForPoint = [];
-    // for (let i = 0; i < n; i++) {
-    //     const arr = [];
-    //     for (const val of edges) {
-    //         const valReversed = [val[1], val[0]];
-    //         routes.set(JSON.stringify(val), false);
-    //         routes.set(JSON.stringify(valReversed), false);
-    //     }
-    // }
+    const routesForPoint = [];
+    for (let i = 0; i < n; i++) {
+        const arr = [];
+        for (const val of edgesWithBackRoutes) {
+            if (val[0] === i) {
+                arr.push(val);
+            }
+        }
+        routesForPoint.push(arr);
+    }
+    console.log("routesForPoint:", routesForPoint);
 };
 
 // // console.log(
