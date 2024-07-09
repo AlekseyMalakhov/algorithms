@@ -30,7 +30,7 @@ Constraints:
 */
 
 var validPath = function (n, edges, source, destination) {
-    console.log("start");
+    // console.log("start");
     //check edge case
     if (edges.length === 0 && source === 0 && destination === 0) {
         return true;
@@ -42,7 +42,7 @@ var validPath = function (n, edges, source, destination) {
         routesForPoint.push([]);
     }
 
-    //console.log("routesForPoint:", routesForPoint);
+    // console.log("routesForPoint:", routesForPoint);
 
     const edgesWithBackRoutes = [];
 
@@ -62,12 +62,12 @@ var validPath = function (n, edges, source, destination) {
         routesForPoint[p2].push(valReversed);
     }
 
-    //console.log("edgesWithBackRoutes:", edgesWithBackRoutes);
+    // console.log("edgesWithBackRoutes:", edgesWithBackRoutes);
 
-    console.log("edgesWithBackRoutes ready");
+    // console.log("edgesWithBackRoutes ready");
 
-    //console.log("routesForPoint:", routesForPoint);
-    console.log("routesForPoint ready");
+    // console.log("routesForPoint:", routesForPoint);
+    // console.log("routesForPoint ready");
     /*
     routesForPoint: [
         [ [ 0, 1 ], [ 0, 2 ], [ 0, 3 ] ],
@@ -89,12 +89,18 @@ var validPath = function (n, edges, source, destination) {
 
     const checkRoutes = (prevPoint, point) => {
         // console.log("--------------------New checkRoutes call------------------------");
+        //debug
+        if (path.length > record) {
+            record = record * 2;
+            // console.log("record = " + record);
+        }
+        //end debug
         // console.log("point:", point);
         const routes = routesForPoint[point];
         for (const route of routes) {
-            //console.log("route:", route);
+            // console.log("route:", route);
             const isUsed = used[JSON.stringify(route)];
-            //console.log(isUsed);
+            // console.log(isUsed);
             if (!isUsed && route[1] !== prevPoint) {
                 //if this route does not lead back to the previous point
                 //add this route to the path
@@ -105,13 +111,15 @@ var validPath = function (n, edges, source, destination) {
                 const newPoint = route[1];
                 //update previous point
                 const newPrevPoint = point;
-                // // console.log("prevPoint:", newPrevPoint);
-                // // console.log("newPoint:", newPoint);
+                // console.log("prevPoint:", newPrevPoint);
+                // console.log("newPoint:", newPoint);
                 if (newPoint === destination) {
                     // console.log("-------------this is destination!------------");
                     return true;
                 } else {
-                    // // console.log("Run new checkRoutes with prevPoint = " + newPrevPoint + ", and point = " + newPoint);
+                    // console.log("Run new checkRoutes with prevPoint = " + newPrevPoint + ", and point = " + newPoint);
+
+                    //normal solution
                     const res = checkRoutes(newPrevPoint, newPoint);
                     if (res) {
                         return true;
@@ -126,12 +134,6 @@ var validPath = function (n, edges, source, destination) {
         //if we checked all routes but have not found correct one, probably
         //this route is wrong
 
-        //debug
-        if (path.length > record) {
-            record = record * 2;
-            console.log("record = " + record);
-        }
-        //end debug
         return false;
     };
 
@@ -140,65 +142,65 @@ var validPath = function (n, edges, source, destination) {
     return res;
 };
 
-// // // console.log(
-// // //     validPath(
-// // //         3,
-// // //         [
-// // //             [0, 1],
-// // //             [1, 2],
-// // //             [2, 0],
-// // //         ],
-// // //         0,
-// // //         2
-// // //     )
-// // // );
+// console.log(
+// validPath(
+// 3,
+// [
+// [0, 1],
+// [1, 2],
+// [2, 0],
+// ],
+// 0,
+// 2
+// )
+// );
+
+// console.log(
+// validPath(
+// 6,
+// [
+// [0, 1],
+// [0, 2],
+// [3, 5],
+// [5, 4],
+// [4, 3],
+// ],
+// 0,
+// 5
+// )
+// );
 
 // console.log(
 //     validPath(
-//         6,
+//         5,
 //         [
 //             [0, 1],
 //             [0, 2],
-//             [3, 5],
-//             [5, 4],
-//             [4, 3],
+//             [0, 3],
+//             [2, 4],
 //         ],
 //         0,
-//         5
+//         4
 //     )
 // );
 
-console.log(
-    validPath(
-        5,
-        [
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [2, 4],
-        ],
-        0,
-        4
-    )
-);
+// console.log(
+// validPath(
+// 6,
+// [
+// [0, 1],
+// [0, 3],
+// [0, 5],
+// [2, 5],
+// [4, 2],
+// [3, 2],
+// ],
+// 0,
+// 4
+// )
+// );
 
-// // console.log(
-// //     validPath(
-// //         6,
-// //         [
-// //             [0, 1],
-// //             [0, 3],
-// //             [0, 5],
-// //             [2, 5],
-// //             [4, 2],
-// //             [3, 2],
-// //         ],
-// //         0,
-// //         4
-// //     )
-// // );
+// console.log(validPath(1, [], 0, 0));
 
-// // console.log(validPath(1, [], 0, 0));
-
-// import { edges } from "./edges.js";
-// console.log(validPath(200000, edges, 0, 199999));
+import { edges } from "./edges.js";
+console.log(validPath(200000, edges, 0, 199999));
