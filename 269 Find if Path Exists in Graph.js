@@ -36,7 +36,16 @@ var validPath = function (n, edges, source, destination) {
         return true;
     }
 
+    //let's create a list of directions for every point
+    const routesForPoint = [];
+    for (let i = 0; i < n; i++) {
+        routesForPoint.push([]);
+    }
+
+    //console.log("routesForPoint:", routesForPoint);
+
     const edgesWithBackRoutes = [];
+
     for (const val of edges) {
         const valReversed = [val[1], val[0]];
         edgesWithBackRoutes.push(val);
@@ -46,24 +55,18 @@ var validPath = function (n, edges, source, destination) {
         if ((val[1] === source && val[0] === destination) || (val[0] === source && val[1] === destination)) {
             return true;
         }
+
+        const p1 = val[0];
+        const p2 = val[1];
+        routesForPoint[p1].push(val);
+        routesForPoint[p2].push(valReversed);
     }
 
-    // console.log("edgesWithBackRoutes:", edgesWithBackRoutes);
+    //console.log("edgesWithBackRoutes:", edgesWithBackRoutes);
 
     console.log("edgesWithBackRoutes ready");
 
-    //let's create a list of directions for every point
-    const routesForPoint = [];
-    for (let i = 0; i < n; i++) {
-        const arr = [];
-        for (const val of edgesWithBackRoutes) {
-            if (val[0] === i) {
-                arr.push(val);
-            }
-        }
-        routesForPoint.push(arr);
-    }
-    // console.log("routesForPoint:", routesForPoint);
+    //console.log("routesForPoint:", routesForPoint);
     console.log("routesForPoint ready");
     /*
     routesForPoint: [
@@ -165,19 +168,19 @@ var validPath = function (n, edges, source, destination) {
 //     )
 // );
 
-// // console.log(
-// //     validPath(
-// //         5,
-// //         [
-// //             [0, 1],
-// //             [0, 2],
-// //             [0, 3],
-// //             [2, 4],
-// //         ],
-// //         0,
-// //         4
-// //     )
-// // );
+console.log(
+    validPath(
+        5,
+        [
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [2, 4],
+        ],
+        0,
+        4
+    )
+);
 
 // // console.log(
 // //     validPath(
@@ -197,5 +200,5 @@ var validPath = function (n, edges, source, destination) {
 
 // // console.log(validPath(1, [], 0, 0));
 
-import { edges } from "./edges.js";
-console.log(validPath(200000, edges, 0, 199999));
+// import { edges } from "./edges.js";
+// console.log(validPath(200000, edges, 0, 199999));
