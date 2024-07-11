@@ -35,7 +35,7 @@ const checkCalls = () => {
 };
 
 var validPath = function (n, edges, source, destination) {
-    // // console.log("start");
+    //console.log("start");
     //check edge case
     if (edges.length === 0 && source === 0 && destination === 0) {
         return true;
@@ -94,6 +94,7 @@ var validPath = function (n, edges, source, destination) {
     let record = 5;
 
     const checkRoutes = (prevPoint, point) => {
+        //checkCalls();
         // console.log("--------------------New checkRoutes call------------------------");
         //debug
         // if (path.length > record) {
@@ -101,7 +102,7 @@ var validPath = function (n, edges, source, destination) {
         // //     // console.log("record = " + record);
         // }
         //end debug
-        // console.log("point:", point);
+        //console.log("point:", point);
         const routes = routesForPoint[point];
         for (const route of routes) {
             // console.log("point: " + point + " - " + "route:", route);
@@ -147,6 +148,7 @@ var validPath = function (n, edges, source, destination) {
 
     const res = checkRoutes(null, source);
     // // console.log(path);
+    //console.log("lala");
     return res;
 };
 
@@ -157,7 +159,7 @@ var validPath2 = function (n, edges, source, destination) {
         g[i[0]].push(i[1]);
         g[i[1]].push(i[0]);
     }
-    console.log("g:", g); //this is the same as my routesForPoint
+    //console.log("g:", g); //this is the same as my routesForPoint
     // [ [ 1, 2, 3 ], [ 0 ], [ 0, 4 ], [ 0 ], [ 2 ] ]
 
     let vis = new Array(n).fill(0); //handle visited
@@ -166,6 +168,7 @@ var validPath2 = function (n, edges, source, destination) {
 };
 
 var rec = (node, g, vis) => {
+    //checkCalls();
     vis[node] = 1; //mark the node as visited. Similar as my used.set(route, true);
     for (let i of g[node]) {
         //iterate along the possible routes for the current node. Similar to my for (const route of routes) {
@@ -201,19 +204,22 @@ var rec = (node, g, vis) => {
 //     )
 // );
 
-console.log(
-    validPath2(
-        5,
-        [
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [2, 4],
-        ],
-        0,
-        4
-    )
-);
+//const start = performance.now();
+// console.log(
+//     validPath(
+//         5,
+//         [
+//             [0, 1],
+//             [0, 2],
+//             [0, 3],
+//             [2, 4],
+//         ],
+//         0,
+//         4
+//     )
+// );
+// const end = performance.now();
+//console.log(`Execution time: ${end - start} ms`);
 
 // console.log(
 // validPath2(
@@ -233,5 +239,12 @@ console.log(
 
 // // console.log(validPath(1, [], 0, 0));
 
-// import { edges } from "./edges.js";
-// console.log(validPath2(200000, edges, 0, 199999));
+import { edges } from "./edges2.js";
+
+const start = performance.now();
+
+console.log(validPath2(2498, edges, 0, 2497));
+
+const end = performance.now();
+
+console.log(`Execution time: ${end - start} ms`);
