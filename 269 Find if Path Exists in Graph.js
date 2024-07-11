@@ -183,12 +183,9 @@ var validPath3 = function (n, edges, source, destination) {
     }
 
     const routesForPoint = [];
-    const edgesWithBackRoutes = [];
 
     for (const val of edges) {
         const valReversed = [val[1], val[0]];
-        edgesWithBackRoutes.push(val);
-        edgesWithBackRoutes.push(valReversed);
 
         if ((val[1] === source && val[0] === destination) || (val[0] === source && val[1] === destination)) {
             return true;
@@ -206,7 +203,7 @@ var validPath3 = function (n, edges, source, destination) {
         routesForPoint[p2].push(valReversed);
     }
 
-    const path = [];
+    //const path = [];
     const used = new Map();
 
     const checkRoutes = (prevPoint, point) => {
@@ -215,7 +212,7 @@ var validPath3 = function (n, edges, source, destination) {
             const isUsed = used.has(route);
 
             if (!isUsed && route[1] !== prevPoint) {
-                path.push(route);
+                //path.push(route);
                 used.set(route, true);
                 const newPoint = route[1];
                 const newPrevPoint = point;
@@ -225,9 +222,8 @@ var validPath3 = function (n, edges, source, destination) {
                     const res = checkRoutes(newPrevPoint, newPoint);
                     if (res) {
                         return true;
-                    } else {
-                        const wrongPath = path.pop();
                     }
+                    return false;
                 }
             }
         }
@@ -305,7 +301,7 @@ import { edges } from "./edges2.js";
 
 const start = performance.now();
 
-console.log(validPath2(2498, edges, 0, 2497));
+console.log(validPath3(2498, edges, 0, 2497));
 
 const end = performance.now();
 
