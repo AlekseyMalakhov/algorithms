@@ -184,6 +184,8 @@ var validPath3 = function (n, edges, source, destination) {
 
     const routesForPoint = [];
 
+    let result = false;
+
     for (const val of edges) {
         const valReversed = [val[1], val[0]];
 
@@ -203,7 +205,6 @@ var validPath3 = function (n, edges, source, destination) {
         routesForPoint[p2].push(valReversed);
     }
 
-    //const path = [];
     const used = new Map();
 
     const checkRoutes = (prevPoint, point) => {
@@ -212,26 +213,21 @@ var validPath3 = function (n, edges, source, destination) {
             const isUsed = used.has(route);
 
             if (!isUsed && route[1] !== prevPoint) {
-                //path.push(route);
                 used.set(route, true);
                 const newPoint = route[1];
                 const newPrevPoint = point;
                 if (newPoint === destination) {
-                    return true;
+                    result = true;
                 } else {
-                    const res = checkRoutes(newPrevPoint, newPoint);
-                    if (res) {
-                        return true;
-                    }
-                    return false;
+                    checkRoutes(newPrevPoint, newPoint);
                 }
             }
         }
         return false;
     };
 
-    const res = checkRoutes(null, source);
-    return res;
+    checkRoutes(null, source);
+    return result;
 };
 
 // // console.log(
