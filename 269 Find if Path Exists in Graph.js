@@ -82,7 +82,8 @@ var validPath = function (n, edges, source, destination) {
     const path = [];
 
     //create an object to easily check if route is used
-    const used = {};
+    const used = new Map();
+
     //when we put route into stack we will at the same time put it into used object
 
     let record = 5;
@@ -99,14 +100,15 @@ var validPath = function (n, edges, source, destination) {
         const routes = routesForPoint[point];
         for (const route of routes) {
             // console.log("point: " + point + " - " + "route:", route);
-            const isUsed = used[JSON.stringify(route)];
+            //console.log("used:", used);
+            const isUsed = used.has(route);
             // console.log("point: " + point + " - " + "isUsed:", isUsed);
             if (!isUsed && route[1] !== prevPoint) {
                 //if this route does not lead back to the previous point
                 //add this route to the path
                 // console.log("point: " + point + " - " + "good route found " + route);
                 path.push(route);
-                used[JSON.stringify(route)] = true;
+                used.set(route, true);
                 //create new point to go
                 const newPoint = route[1];
                 //update previous point
@@ -156,34 +158,34 @@ var validPath = function (n, edges, source, destination) {
 // // )
 // // );
 
-// // console.log(
-// // validPath(
-// // 6,
-// // [
-// // [0, 1],
-// // [0, 2],
-// // [3, 5],
-// // [5, 4],
-// // [4, 3],
-// // ],
-// // 0,
-// // 5
-// // )
-// // );
+// console.log(
+//     validPath(
+//         6,
+//         [
+//             [0, 1],
+//             [0, 2],
+//             [3, 5],
+//             [5, 4],
+//             [4, 3],
+//         ],
+//         0,
+//         5
+//     )
+// );
 
-console.log(
-    validPath(
-        5,
-        [
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [2, 4],
-        ],
-        0,
-        4
-    )
-);
+// console.log(
+//     validPath(
+//         5,
+//         [
+//             [0, 1],
+//             [0, 2],
+//             [0, 3],
+//             [2, 4],
+//         ],
+//         0,
+//         4
+//     )
+// );
 
 // console.log(
 // validPath2(
@@ -203,5 +205,5 @@ console.log(
 
 // // console.log(validPath(1, [], 0, 0));
 
-// import { edges } from "./edges.js";
-// console.log(validPath2(200000, edges, 0, 199999));
+import { edges } from "./edges.js";
+console.log(validPath(200000, edges, 0, 199999));
