@@ -28,6 +28,11 @@ Constraints:
     There are no duplicate edges.
     There are no self edges.
 */
+let n = 0;
+const checkCalls = () => {
+    n++;
+    console.log("Recursive function call = " + n);
+};
 
 var validPath = function (n, edges, source, destination) {
     // // console.log("start");
@@ -145,6 +150,29 @@ var validPath = function (n, edges, source, destination) {
     return res;
 };
 
+var validPath2 = function (n, edges, source, destination) {
+    let g = new Array(n);
+    for (let i = 0; i < n; i++) g[i] = [];
+    for (let i of edges) {
+        g[i[0]].push(i[1]);
+        g[i[1]].push(i[0]);
+    }
+    console.log("g:", g); //this is the same as my routesForPoint
+    // [ [ 1, 2, 3 ], [ 0 ], [ 0, 4 ], [ 0 ], [ 2 ] ]
+
+    let vis = new Array(n).fill(0); //handle visited
+    rec(source, g, vis);
+    return vis[destination];
+};
+
+var rec = (node, g, vis) => {
+    vis[node] = 1; //mark the node as visited. Similar as my used.set(route, true);
+    for (let i of g[node]) {
+        //iterate along the possible routes for the current node. Similar to my for (const route of routes) {
+        if (!vis[i]) rec(i, g, vis); //similar to mine  if (!isUsed && route[1] !== prevPoint) { -
+    }
+};
+
 // // console.log(
 // // validPath(
 // // 3,
@@ -173,19 +201,19 @@ var validPath = function (n, edges, source, destination) {
 //     )
 // );
 
-// console.log(
-//     validPath(
-//         5,
-//         [
-//             [0, 1],
-//             [0, 2],
-//             [0, 3],
-//             [2, 4],
-//         ],
-//         0,
-//         4
-//     )
-// );
+console.log(
+    validPath2(
+        5,
+        [
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [2, 4],
+        ],
+        0,
+        4
+    )
+);
 
 // console.log(
 // validPath2(
@@ -205,5 +233,5 @@ var validPath = function (n, edges, source, destination) {
 
 // // console.log(validPath(1, [], 0, 0));
 
-import { edges } from "./edges.js";
-console.log(validPath(200000, edges, 0, 199999));
+// import { edges } from "./edges.js";
+// console.log(validPath2(200000, edges, 0, 199999));
