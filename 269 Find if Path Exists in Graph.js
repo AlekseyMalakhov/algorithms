@@ -163,6 +163,7 @@ var validPath2 = function (n, edges, source, destination) {
     // [ [ 1, 2, 3 ], [ 0 ], [ 0, 4 ], [ 0 ], [ 2 ] ]
 
     let vis = new Array(n).fill(0); //handle visited
+
     rec(source, g, vis);
     return vis[destination];
 };
@@ -174,6 +175,67 @@ var rec = (node, g, vis) => {
         //iterate along the possible routes for the current node. Similar to my for (const route of routes) {
         if (!vis[i]) rec(i, g, vis); //similar to mine  if (!isUsed && route[1] !== prevPoint) { -
     }
+};
+
+var validPath3 = function (n, edges, source, destination) {
+    if (edges.length === 0 && source === 0 && destination === 0) {
+        return true;
+    }
+
+    const routesForPoint = [];
+    const edgesWithBackRoutes = [];
+
+    for (const val of edges) {
+        const valReversed = [val[1], val[0]];
+        edgesWithBackRoutes.push(val);
+        edgesWithBackRoutes.push(valReversed);
+
+        if ((val[1] === source && val[0] === destination) || (val[0] === source && val[1] === destination)) {
+            return true;
+        }
+
+        const p1 = val[0];
+        const p2 = val[1];
+        if (routesForPoint[p1] === undefined) {
+            routesForPoint[p1] = [];
+        }
+        if (routesForPoint[p2] === undefined) {
+            routesForPoint[p2] = [];
+        }
+        routesForPoint[p1].push(val);
+        routesForPoint[p2].push(valReversed);
+    }
+
+    const path = [];
+    const used = new Map();
+
+    const checkRoutes = (prevPoint, point) => {
+        const routes = routesForPoint[point];
+        for (const route of routes) {
+            const isUsed = used.has(route);
+
+            if (!isUsed && route[1] !== prevPoint) {
+                path.push(route);
+                used.set(route, true);
+                const newPoint = route[1];
+                const newPrevPoint = point;
+                if (newPoint === destination) {
+                    return true;
+                } else {
+                    const res = checkRoutes(newPrevPoint, newPoint);
+                    if (res) {
+                        return true;
+                    } else {
+                        const wrongPath = path.pop();
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
+    const res = checkRoutes(null, source);
+    return res;
 };
 
 // // console.log(
@@ -248,3 +310,15 @@ console.log(validPath2(2498, edges, 0, 2497));
 const end = performance.now();
 
 console.log(`Execution time: ${end - start} ms`);
+
+/*
+validPath and validPath2 has the same amount of recursion calls
+and when calling with console.log they differ only for 4 ms, despite
+their execution time increases to 102 and 106 ms
+it means that problem probably not in recursion itself but in preparation 
+phase
+
+lets try to remove recursion and leave only the preparation phase
+Preparation phase is very similar in time - 6 and 7 ms
+
+*/
