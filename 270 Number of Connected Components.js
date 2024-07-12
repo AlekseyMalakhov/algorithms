@@ -20,12 +20,8 @@ Constraints:
 */
 
 var countComponents = function (n, edges) {
-    //1) we should keep track of nodes which we already checked. Let's create an array af them with true/false values
-    //it will have faster access then object or map
     const checked = Array(n).fill(false);
     // console.log("checked:", checked);
-
-    //and we should prepare a list of connected nodes for every node;
 
     const connections = [];
 
@@ -45,35 +41,19 @@ var countComponents = function (n, edges) {
     }
 
     // console.log("connections:", connections);
-    //2) We should walk along the edges recursively until we find a leaf.
-    //every time ve find a leaf, we should return to the base node an go to another branch
-
-    //3) After there is no more branches to walk to, we should add 1 to the list of available areas.
-
-    //4) Then we should check if all the items in
-    //the graph have been checked. If some of them has not been checked - it means there is some more
-    //possible isolated areas. And we should check them.
-
-    //From which node to start a new check? That is a question. Of corse we can search the checked array and start
-    //from the first available unchecked node. But traversing array every time is not a good practice.
-    //but in this case it's very short - maximum 2000 items. So we will travers it and if we get and time limit error -
-    //we will figure out something new.
 
     const searchForLimit = (node) => {
-        console.log("node:", node);
+        //console.log("node:", node);
         //if we take node - make it checked
         checked[node] = true;
 
         //get the list of connections for a current node
         const directions = connections[node];
-        console.log("node = " + node + ", " + "directions:", directions);
-
-        //go along the directions and check if they are leafs
-
-        // if (directions.length === 1 && checked[directions[0]]) {
-        //     //if there is only one direction and it goes back to the checked node - it is a leaf
-        //     return true;
-        // }
+        //console.log("node = " + node + ", " + "directions:", directions);
+        if (!directions) {
+            //it's a node without neighbor
+            return;
+        }
 
         for (const direction of directions) {
             const isChecked = checked[direction];
@@ -81,12 +61,6 @@ var countComponents = function (n, edges) {
             if (!isChecked) {
                 //if this node has not been checked before - check it
                 searchForLimit(direction);
-                //we should keep track of nodes which belong to the same group. And when there is no such nodes - finish group
-                //when we are in a node, we should determine that this node is the last node of a group
-                //how can we do it?
-
-                //in general we don't care about what searchForLimit functio will return
-                //the most important is to check as much nodes as possible
             }
         }
     };
@@ -107,8 +81,6 @@ var countComponents = function (n, edges) {
     }
 
     // console.log(checked);
-
-    //now we should
 
     return found;
 };
