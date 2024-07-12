@@ -23,7 +23,7 @@ var countComponents = function (n, edges) {
     //1) we should keep track of nodes which we already checked. Let's create an array af them with true/false values
     //it will have faster access then object or map
     const checked = Array(n).fill(false);
-    console.log("checked:", checked);
+    // console.log("checked:", checked);
 
     //and we should prepare a list of connected nodes for every node;
 
@@ -44,7 +44,7 @@ var countComponents = function (n, edges) {
         connections[point2].push(point1);
     }
 
-    console.log("connections:", connections);
+    // console.log("connections:", connections);
     //2) We should walk along the edges recursively until we find a leaf.
     //every time ve find a leaf, we should return to the base node an go to another branch
 
@@ -59,14 +59,14 @@ var countComponents = function (n, edges) {
     //but in this case it's very short - maximum 2000 items. So we will travers it and if we get and time limit error -
     //we will figure out something new.
 
-    let found = 0;
-
     const searchForLimit = (node) => {
+        console.log("node:", node);
         //if we take node - make it checked
         checked[node] = true;
 
         //get the list of connections for a current node
         const directions = connections[node];
+        console.log("node = " + node + ", " + "directions:", directions);
 
         //go along the directions and check if they are leafs
 
@@ -91,18 +91,40 @@ var countComponents = function (n, edges) {
         }
     };
 
-    found = 1;
+    let found = 0;
     //start from the node 0
-    searchForLimit(0);
-    console.log(checked);
+    let baseNode = 0;
+
+    while (baseNode !== -1) {
+        found++;
+        searchForLimit(baseNode);
+        //after we checked for the whole graph from the current baseNode
+        //we should check - if there are any not checked nodes still available
+        //if there is some - grab the first available and start from the start
+        baseNode = checked.findIndex((item) => !item);
+        //if no base node found it means we checked the whole graph and all possible
+        //isles found
+    }
+
+    // console.log(checked);
+
+    //now we should
 
     return found;
 };
 
+// console.log(
+// countComponents(5, [
+// [0, 1],
+// [1, 2],
+// [3, 4],
+// ])
+// );
+
 console.log(
-    countComponents(5, [
-        [0, 1],
+    countComponents(4, [
+        [2, 3],
         [1, 2],
-        [3, 4],
+        [1, 3],
     ])
 );
