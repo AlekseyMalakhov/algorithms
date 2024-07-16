@@ -32,20 +32,56 @@ Constraints:
 var reachableNodes = function (n, edges, restricted) {
     //1 create a list of neighbors for ever node
 
-    const neighbors = [];
+    const neighborsList = [];
     for (let i = 0; i < edges.length; i++) {
         const n1 = edges[i][0];
         const n2 = edges[i][1];
-        if (neighbors[n1] === undefined) {
-            neighbors[n1] = [];
+        if (neighborsList[n1] === undefined) {
+            neighborsList[n1] = [];
         }
-        if (neighbors[n2] === undefined) {
-            neighbors[n2] = [];
+        if (neighborsList[n2] === undefined) {
+            neighborsList[n2] = [];
         }
-        neighbors[n1].push(n2);
-        neighbors[n2].push(n1);
+        neighborsList[n1].push(n2);
+        neighborsList[n2].push(n1);
     }
-    console.log("neighbors:", neighbors);
+    // //console.log("neighborsList:", neighborsList);
+
+    const restrictedList = Array(n).fill(false);
+
+    for (let i = 0; i < restricted.length; i++) {
+        const item = restricted[i];
+        restrictedList[item] = true;
+    }
+
+    //console.log("restrictedList:", restrictedList);
+    //2 let's walk along the list of nodes starting from 0 and calculate how much nodes we can reach
+
+    const checked = Array(n).fill(false);
+    // //console.log("checked:", checked);
+
+    let visited = 0;
+
+    const checkNeighbors = (node) => {
+        // console.log("----------------------");
+        // console.log("node:", node);
+
+        if (restrictedList[node] || checked[node]) {
+            //this node is restricted or has been checked already
+            return false;
+        }
+        checked[node] = true;
+        visited++;
+        const neighbors = neighborsList[node];
+        for (let neighbor of neighbors) {
+            // console.log("node: " + node + ", check neighbor " + neighbor);
+            checkNeighbors(neighbor);
+        }
+    };
+
+    checkNeighbors(0);
+
+    return visited;
 };
 
 console.log(
@@ -60,5 +96,20 @@ console.log(
             [5, 6],
         ],
         [4, 5]
+    )
+);
+
+console.log(
+    reachableNodes(
+        7,
+        [
+            [0, 1],
+            [0, 2],
+            [0, 5],
+            [0, 4],
+            [3, 2],
+            [6, 5],
+        ],
+        [4, 2, 1]
     )
 );
