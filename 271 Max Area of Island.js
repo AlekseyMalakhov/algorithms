@@ -24,36 +24,57 @@ Constraints:
 */
 
 var maxAreaOfIsland = function (grid) {
-    /*
-    We should walk along the matrix. Every element of the matrix is a node. We should keep track of nodes
-    which we have checked and mark them as checked somewhere.
-    Whenever we find a "1" node which we haven't checked before it means it is the start of the island.
-    We begin to check it's neighbors recursively and mark them as checked. When all neighbors are checked
-    it means the island is found.
-    We increment island count, return to the start of the island, and continue traversing matrix searching
-    for a "1" node which have not been checked before    
-    */
-
-    let islands = 0;
+    let maxArea = 0;
     const checked = Array(grid.length);
-    console.log("checked:", checked);
 
     for (let i = 0; i < grid.length; i++) {
         const row = grid[i];
         checked[i] = Array(row.length).fill(false);
+    }
+
+    const calculateArea = (area, coords) => {
+        const i = coords[0];
+        const j = coords[1];
+
+        if (!grid[i] || !grid[i][j]) {
+            //if node === 0 || undefined
+            return 0;
+        }
+
+        if (checked[i][j]) {
+            //if node === 1 but has already been checked
+            return 0;
+        }
+
+        //else check it
+        checked[i][j] = true;
+        //add it to the area
+        area++;
+        //calculate area of neighbors
+        const leftArea = calculateArea(0, [i, j - 1]);
+        const rightArea = calculateArea(0, [i, j + 1]);
+        const topArea = calculateArea(0, [i + 1, j]);
+        const bottomArea = calculateArea(0, [i - 1, j]);
+        //return the total area for this node
+        return area + leftArea + rightArea + topArea + bottomArea;
+    };
+
+    for (let i = 0; i < grid.length; i++) {
+        const row = grid[i];
         for (let j = 0; j < row.length; j++) {
             const node = row[j];
-            if (node === 1) {
-                checked[i][j] = true;
-                //console.log("Found 1 at i = " + i + ", j = " + j);
+            if (!checked[i][j] && node === 1) {
+                //it's a start of a new island
+                //let's search of the neighbors of the node and calculate it's area
+                const area = calculateArea(0, [i, j]);
+                if (area > maxArea) {
+                    maxArea = area;
+                }
             }
         }
-        // console.log("i = " + i);
-        // console.log(checked[i]);
-        // console.log("----------");
     }
-    console.log(checked);
-    return islands;
+
+    return maxArea;
 };
 
 const grid1 = [
@@ -68,8 +89,8 @@ const grid1 = [
 ];
 console.log(maxAreaOfIsland(grid1));
 
-// const grid2 = [[0, 0, 0, 0, 0, 0, 0, 0]];
-// console.log(maxAreaOfIsland(grid2));
+const grid2 = [[0, 0, 0, 0, 0, 0, 0, 0]];
+console.log(maxAreaOfIsland(grid2));
 
 const check = [
     [false, false, true, false, false, false, false, true, false, false, false, false, false],
