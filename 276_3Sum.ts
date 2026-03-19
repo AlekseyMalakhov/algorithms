@@ -14,10 +14,13 @@ const threeSum = (arr: number[]): number[][] => {
         // then on every next for loop we will get the same array result until
         // this repeated -1s are finished. So to remove this, before starting a new for loop
         // we should check if we have a result with this i
-        //If we have the result with the same i then now we will again get the same result
+        // If we have the result with the same i then now we will again get the same result
         // so we should skip this iteration and move further
         // you cant encounter the same value again because the array is sorted.
         // so this array [-4, -1, -1, 0, 1, -1, 2, 10] is impossible to have
+        // moreover if you have the same fixed result you will either find the same or find nothing
+        // it's impossible to find some new combination with the same fixed result and the same sorted array
+        // you will either find the same (duplicate) or find nothing
         if (i > 0 && arr[i] === arr[i - 1]) {
             // we have already parsed this fixed value - let's move forward
             // otherwise we will get the same result
@@ -84,3 +87,5 @@ console.log(threeSum([-1, 0, 1, 2, -1, -4, 10]));
 // [-4, -1, -1, 0, 1, 2, 10]
 
 console.log(threeSum([0, 0, 0, 0, 0, 0, 0, 0]));
+
+// [2, 2, 2, 2, -1, -1, -1, -1]
