@@ -1,5 +1,8 @@
 function maxSubArray(nums: number[]): number {
-    return 5;
+    let [currentSum, largestSum] = [0, nums[0]];
+    nums.forEach((n) => {
+        currentSum = Math.max(n, currentSum + n);
+        largestSum = Math.max(currentSum, largestSum);
+    });
+    return largestSum;
 }
-
-const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
