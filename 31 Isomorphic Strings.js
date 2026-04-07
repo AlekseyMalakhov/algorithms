@@ -1,48 +1,51 @@
-/*
-Given two strings s and t, determine if they are isomorphic.
-Two strings s and t are isomorphic if the characters in s can be replaced to get t.
-All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character, but a character may map to itself.
- 
-
-Example 1:
-
-Input: s = "egg", t = "add"
-Output: true
-
-Example 2:
-
-Input: s = "foo", t = "bar"
-Output: false
-
-Example 3:
-
-Input: s = "paper", t = "title"
-Output: true
- 
-
-Constraints:
-
-    1 <= s.length <= 5 * 104
-
-*/
-
 var isIsomorphic = function (s, t) {
-  const obj = {};
-  for (let i = 0; i < s.length; i++) {
-    if (!obj[s[i]]) {
-      obj[s[i]] = t[i];
-    } else {
-      if (obj[s[i]] !== t[i]) {
-        return false;
-      }
+    const obj = {};
+    const used = {};
+
+    for (let i = 0; i < s.length; i++) {
+        const letterS = s[i];
+        const letterT = t[i];
+
+        // if map exists but it points to incorrect letter T - stop
+        if (obj[letterS] !== undefined && obj[letterS] !== letterT) {
+            return false;
+        }
+
+        // if map does not exist but current letter T has already been used with another letter S - stop
+        if (!obj[letterS] && used[letterT]) {
+            return false;
+        }
+
+        // if map for current letter S does not exist and letter T has not been used before with another letter S
+        if (!obj[letterS] && !used[letterT]) {
+            // create a map
+            obj[letterS] = letterT;
+            // mark a used letterT
+            used[letterT] = true;
+        }
+
+        // proceed
     }
-  }
-  console.log(obj);
-  return true;
+
+    // console.log(obj);
+
+    return true;
 };
 
-// console.log(isIsomorphic("egg", "add"));
-// console.log(isIsomorphic("foo", "bar"));
-// console.log(isIsomorphic("paper", "title"));
+console.log(isIsomorphic("egg", "add"));
+console.log("---------------------");
+console.log(isIsomorphic("f11", "b23"));
+console.log("---------------------");
+console.log(isIsomorphic("paper", "title"));
+console.log("---------------------");
+/*
 
-console.log(isIsomorphic("badc", "baba"));
+{ 
+ b: 'b', 
+ a: 'a', 
+ d: 'b', 
+ c: 'a' 
+ }
+
+*/
+console.log(isIsomorphic("badc", "baba")); //expected false
